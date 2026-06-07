@@ -1,0 +1,40 @@
+---
+interface TimelineEntry {
+  org: string;
+  title: string;
+  start: string;
+  end: string;
+  location: string;
+  summary: string;
+}
+
+interface Props {
+  entries: TimelineEntry[];
+}
+
+const { entries } = Astro.props;
+
+function formatRange(start: string, end: string) {
+  const formatter = new Intl.DateTimeFormat("en-US", { month: "short", year: "numeric" });
+  return `${formatter.format(new Date(`${start}-01`))} - ${formatter.format(new Date(`${end}-01`))}`;
+}
+---
+
+<div class="timeline">
+  {entries.map((entry) => (
+    <article class="timeline__item">
+      <div class="timeline__rail" aria-hidden="true">
+        <span></span>
+      </div>
+      <div class="timeline__content surface">
+        <p class="eyebrow">{entry.org}</p>
+        <div class="timeline__header">
+          <h3>{entry.title}</h3>
+          <p>{formatRange(entry.start, entry.end)}</p>
+        </div>
+        <p class="timeline__location">{entry.location}</p>
+        <p>{entry.summary}</p>
+      </div>
+    </article>
+  ))}
+</div>

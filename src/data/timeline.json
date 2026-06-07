@@ -1,0 +1,38 @@
+[
+  {
+    "id": "radius",
+    "org": "Radius",
+    "title": "Platform / Infrastructure Engineering Co-op",
+    "start": "2025-09",
+    "end": "2025-12",
+    "location": "Cambridge, MA",
+    "summary": "Owned major parts of the GKE platform stack, accelerated CI, hardened stateful services, and improved deployment safety across multiple environments."
+  },
+  {
+    "id": "socgen",
+    "org": "Societe Generale",
+    "title": "Systems DevOps Engineer",
+    "start": "2022-07",
+    "end": "2024-07",
+    "location": "Bangalore, India",
+    "summary": "Automated migrations, compliance checks, GitOps provisioning, observability, and cloud cost optimization in a regulated banking environment."
+  },
+  {
+    "id": "northeastern",
+    "org": "Northeastern University",
+    "title": "M.S. in Information Systems",
+    "start": "2024-01",
+    "end": "2026-08",
+    "location": "Boston, MA",
+    "summary": "Graduate focus on systems, platform thinking, and modern infrastructure workflows while building cloud-native portfolio projects."
+  },
+  {
+    "id": "pes",
+    "org": "PES University",
+    "title": "B.Tech in Electronics and Communication Engineering",
+    "start": "2018-08",
+    "end": "2022-06",
+    "location": "Bangalore, India",
+    "summary": "Engineering foundation that evolved into infrastructure automation, distributed systems interest, and platform reliability work."
+  }
+]

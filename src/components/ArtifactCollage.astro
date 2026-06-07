@@ -1,0 +1,89 @@
+---
+interface Props {
+  photoSrc: string;
+}
+
+const { photoSrc } = Astro.props;
+
+const tools = [
+  { name: "Kubernetes", icon: "https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/kubernetes.svg" },
+  { name: "Terraform", icon: "https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/terraform.svg" },
+  { name: "ArgoCD", icon: "https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/argo.svg" },
+  { name: "Prometheus", icon: "https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/prometheus.svg" }
+];
+
+const operatingLane = [
+  { label: "observe", note: "metrics + logs" },
+  { label: "verify", note: "gates + policy" },
+  { label: "promote", note: "staged delivery" },
+  { label: "recover", note: "safe rollback" }
+];
+---
+
+<div class="artifact-collage" aria-hidden="true">
+  <article class="artifact artifact--memo">
+    <p class="artifact__eyebrow">release brief / selected artifact</p>
+    <h3>Safer delivery, clearer signals</h3>
+    <p>
+      Platform work here is about release safety, observability, and predictable operations across
+      Kubernetes environments, not just shipping manifests faster.
+    </p>
+    <div class="artifact__stamp">platform systems with proof</div>
+  </article>
+
+  <article class="artifact artifact--portrait">
+    <img src={photoSrc} alt="Portrait of Amogh Jayasimha." />
+    <div class="artifact__portrait-meta">
+      <p class="artifact__eyebrow">operator / profile</p>
+      <span>Boston · platform focus</span>
+    </div>
+  </article>
+
+  <article class="artifact artifact--rail">
+    <p class="artifact__eyebrow">stack in rotation</p>
+    <div class="artifact__logos">
+      {tools.map((tool) => (
+        <span>
+          <img src={tool.icon} alt="" loading="lazy" />
+          {tool.name}
+        </span>
+      ))}
+    </div>
+  </article>
+
+  <article class="artifact artifact--sheet">
+    <div class="artifact__sheet-head">
+      <p>selected systems</p>
+      <p>2026</p>
+    </div>
+    <div class="artifact__signal-list">
+      <div class="artifact__signal">
+        <span>GitOps delivery</span>
+        <p>ArgoCD + Kargo promotion across staged environments</p>
+      </div>
+      <div class="artifact__signal">
+        <span>Payment protocol</span>
+        <p>x402 + Permit2 integration through the Radius facilitator path</p>
+      </div>
+      <div class="artifact__signal">
+        <span>Policy and trust</span>
+        <p>Kyverno admission, signed images, SBOM checks, and visible enforcement</p>
+      </div>
+    </div>
+    <div class="artifact__rule"></div>
+    <div class="artifact__lane" aria-hidden="true">
+      <div class="artifact__lane-head">
+        <p class="artifact__eyebrow">operating lane</p>
+        <span>staging -> verification -> promotion</span>
+      </div>
+      <div class="artifact__lane-steps">
+        {operatingLane.map((step) => (
+          <span>
+            <strong>{step.label}</strong>
+            <small>{step.note}</small>
+          </span>
+        ))}
+      </div>
+    </div>
+  </article>
+</div>

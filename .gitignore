@@ -1,0 +1,8 @@
+dist/
+.astro/
+node_modules/
+.DS_Store
+.env
+.env.*
+coverage/
+amogh_master_reference_v2.md

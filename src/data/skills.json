@@ -1,0 +1,36 @@
+{
+  "core": {
+    "domains": [
+      {
+        "name": "Platform & Cloud",
+        "summary": "Designing repeatable foundations for application delivery across managed Kubernetes and cloud infrastructure.",
+        "tools": ["GKE", "AWS", "GCP", "Terraform", "OpenStack", "Packer"]
+      },
+      {
+        "name": "Kubernetes & Runtime",
+        "summary": "Operating clusters with a bias toward workload safety, stateful reliability, and environment parity.",
+        "tools": ["Kubernetes", "Helm", "KEDA", "Operators", "NetworkPolicies", "cert-manager", "Stateful services"]
+      },
+      {
+        "name": "GitOps / Delivery",
+        "summary": "Building pipelines that optimize for safe promotion, rollback clarity, and environment-aware automation.",
+        "tools": ["ArgoCD", "Kargo", "GitHub Actions", "OIDC", "Artifact Registry", "Minikube"]
+      },
+      {
+        "name": "Observability & Incident Response",
+        "summary": "Treating metrics, logs, and failure drills as release inputs rather than postmortem artifacts.",
+        "tools": ["Prometheus", "Grafana", "Loki", "CloudWatch", "Ops Suite", "Chaos Mesh"]
+      },
+      {
+        "name": "Security & Policy",
+        "summary": "Reducing trust assumptions with policy enforcement, keyless auth, and managed secret flows.",
+        "tools": ["Kyverno", "Cosign", "Sigstore", "External Secrets Operator", "Workload Identity Federation", "Secret Manager"]
+      },
+      {
+        "name": "Languages & Automation",
+        "summary": "Using pragmatic automation to connect platform layers, developer workflows, and operational controls.",
+        "tools": ["Python", "Go", "Bash", "PowerShell", "JavaScript", "PostgreSQL", "Redis"]
+      }
+    ]
+  }
+}

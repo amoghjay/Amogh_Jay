@@ -1,0 +1,28 @@
+{
+  "name": "amoghjay-portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "DevOps/SRE portfolio for Amogh Jayasimha built with Astro.",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check"
+  },
+  "keywords": [
+    "astro",
+    "portfolio",
+    "github-pages",
+    "devops",
+    "sre"
+  ],
+  "author": "Amogh Jayasimha",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "@astrojs/check": "^0.9.9",
+    "astro": "^6.4.4",
+    "typescript": "^6.0.3"
+  }
+}

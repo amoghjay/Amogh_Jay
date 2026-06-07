@@ -1,0 +1,20 @@
+---
+interface Props {
+  name: string;
+  summary: string;
+  tools: string[];
+}
+
+const { name, summary, tools } = Astro.props;
+---
+
+<article class="skill-domain surface">
+  <div class="skill-domain__header">
+    <h3>{name}</h3>
+    <span class="status-dot"></span>
+  </div>
+  <p>{summary}</p>
+  <div class="chip-list">
+    {tools.map((tool) => <span class="chip">{tool}</span>)}
+  </div>
+</article>

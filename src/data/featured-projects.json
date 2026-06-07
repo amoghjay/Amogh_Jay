@@ -1,0 +1,85 @@
+[
+  {
+    "id": "k8s-chaos-promotion",
+    "title": "Chaos-Gated GitOps Promotion on GKE",
+    "repo": "amoghjay/k8s-chaos-promotion",
+    "summary": "A Kubernetes delivery platform where staging cannot promote to production unless the application survives live Chaos Mesh failure injection under k6 load.",
+    "problem": "Most pipelines prove that manifests apply. They do not prove that payment-critical workloads still behave correctly when pods die, dependencies slow down, or network conditions degrade during promotion.",
+    "approach": "Built a GKE-based GitOps stack with ArgoCD, Kargo, Helm, ESO, Prometheus, Loki, and Chaos Mesh. The promotion design treats failure testing as a release gate, not a post-release exercise, and pairs it with real payment flow behavior instead of toy traffic.",
+    "impact": "Created a public reference architecture for reliability-gated promotion, backed by measurable x402/Permit2 latency improvements and a live failure-testing workflow designed to stop fragile releases before production.",
+    "stack": [
+      "GKE",
+      "Terraform",
+      "ArgoCD",
+      "Kargo",
+      "Helm",
+      "Chaos Mesh",
+      "Prometheus",
+      "Grafana",
+      "Loki",
+      "PostgreSQL",
+      "FastAPI"
+    ],
+    "status": "In active development",
+    "featured": true,
+    "order": 1,
+    "proofPoints": [
+      "No production promotion until chaos verification passes",
+      "2.5x end-to-end payment latency improvement after x402/Permit2 migration",
+      "Real GKE environment, real on-chain settlement, real failure modes"
+    ]
+  },
+  {
+    "id": "k8s-supply-chain-security",
+    "title": "Kubernetes Supply Chain Security Platform",
+    "repo": "amoghjay/k8s-supply-chain-security",
+    "summary": "A Kyverno-based admission control platform enforcing image signing, SBOM validation, and CVE-aware policy gates before workloads reach production.",
+    "problem": "Teams often bolt supply chain controls onto CI without ensuring the cluster itself rejects untrusted or non-compliant artifacts.",
+    "approach": "Implemented policy-driven controls with Kyverno, Cosign, Sigstore, and reporting workflows that make trust decisions visible and enforceable inside Kubernetes admission.",
+    "impact": "Recognized by the Kyverno community as a showcase reference for policy-based supply chain security patterns.",
+    "stack": [
+      "Kubernetes",
+      "Kyverno",
+      "Cosign",
+      "Sigstore",
+      "Policy Reporter",
+      "GitHub Actions"
+    ],
+    "status": "Open source showcase project",
+    "featured": true,
+    "order": 2,
+    "proofPoints": [
+      "Official Kyverno community showcase recognition",
+      "Cluster-level enforcement instead of CI-only checks",
+      "Admission policies for signatures, SBOMs, and vulnerability posture"
+    ]
+  },
+  {
+    "id": "aws-autoscale-stack",
+    "title": "AWS Auto-Scale Stack Infrastructure Automation",
+    "repo": "amoghjay/aws-autoscale-stack_Infra_Automation",
+    "summary": "A production-style three-tier AWS application provisioned with Terraform, configured with Ansible over SSM, and scaled automatically under real load.",
+    "problem": "Autoscaling demos often stop at provisioning and never show how infrastructure, configuration management, runtime traffic flow, and least-privilege operations work together under load.",
+    "approach": "Built a VPC, ALB, Auto Scaling Group, RDS MySQL, CloudWatch alarm-based scaling, and an Ansible control flow that runs through AWS Systems Manager instead of SSH. New instances bootstrap themselves at launch through user data and local Ansible execution.",
+    "impact": "Turned a traditional AWS three-tier stack into a repeatable platform automation project with documented architecture, self-bootstrapping instances, and observable scaling behavior.",
+    "stack": [
+      "AWS",
+      "Terraform",
+      "Ansible",
+      "CloudWatch",
+      "SSM",
+      "RDS",
+      "Flask",
+      "Packer",
+      "MySQL"
+    ],
+    "status": "Completed infrastructure automation project",
+    "featured": true,
+    "order": 3,
+    "proofPoints": [
+      "CloudWatch alarm-based simple scaling from 2 to 6 app instances under load",
+      "Ansible over AWS Systems Manager with no SSH, no port 22, and no bastion",
+      "Full architecture documented from Terraform state through runtime traffic path"
+    ]
+  }
+]

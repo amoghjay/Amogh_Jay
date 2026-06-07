@@ -1,0 +1,64 @@
+[
+  {
+    "id": "radius-platform",
+    "company": "Radius",
+    "role": "Platform / Infrastructure Engineering Co-op",
+    "period": "Sep 2025 - Dec 2025",
+    "challenge": "Support a fast-moving blockchain infrastructure platform on GKE while improving deployment safety, delivery speed, and stateful system resilience across multiple environments.",
+    "actions": [
+      "Cut config-only PR deployment time from roughly 17 to 27 minutes down to about 2 minutes using GitHub Actions path filtering and registry-level image retagging.",
+      "Unified promotion flow across BM and trunk environments with Kargo, reducing drift between pre-production and release paths.",
+      "Hardened the platform after a state loss incident by adding PVC-backed persistence and anti-affinity rules for co-located Redis, Minio, and routing components.",
+      "Rolled out GitOps access control with Dex, Google Groups, and Terraform so ArgoCD access no longer depended on shared credentials.",
+      "Contributed to cert-manager and mTLS validation under aggressive certificate rotation, surfacing operational limits before rollout."
+    ],
+    "results": [
+      "93% faster config-only deploys for PR workflows",
+      "Safer promotions with more accurate deployment tracking and notifications",
+      "Improved stateful workload survivability during node churn and pod rescheduling"
+    ],
+    "tools": [
+      "GKE",
+      "Terraform",
+      "GitHub Actions",
+      "ArgoCD",
+      "Kargo",
+      "Helm",
+      "Dex",
+      "cert-manager",
+      "Prometheus",
+      "Grafana"
+    ]
+  },
+  {
+    "id": "socgen-devops",
+    "company": "Societe Generale",
+    "role": "Systems DevOps Engineer",
+    "period": "Jul 2022 - Jul 2024",
+    "challenge": "Modernize legacy infrastructure operations in a regulated banking environment while reducing manual effort, accelerating provisioning, and maintaining compliance posture.",
+    "actions": [
+      "Automated more than 200 server migrations with shell tooling and Python services, replacing fragile manual steps with repeatable workflows.",
+      "Built Airflow and Python compliance pipelines for PCI-DSS checks and post-migration validation across cloud perimeters.",
+      "Created GitOps provisioning workflows that reduced IaaS provisioning time from about 2 hours to 25 minutes.",
+      "Implemented right-sizing automation and observability rollout across AWS and GCP estates."
+    ],
+    "results": [
+      "40% less manual migration effort",
+      "Provisioning time reduced from 2 hours to 25 minutes",
+      "25% cloud cost reduction through automated rightsizing",
+      "Operational visibility across 150+ cloud instances"
+    ],
+    "tools": [
+      "Python",
+      "FastAPI",
+      "Airflow",
+      "GitHub Actions",
+      "Prometheus",
+      "Grafana",
+      "AWS",
+      "GCP",
+      "Boto3",
+      "Shell"
+    ]
+  }
+]
