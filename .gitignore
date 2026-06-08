@@ -1,6 +1,7 @@
 dist/
 .astro/
 node_modules/
+.wrangler/
 .DS_Store
 .env
 .env.*
