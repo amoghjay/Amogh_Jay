@@ -31,9 +31,33 @@ const { title, description } = Astro.props;
     <ClientRouter />
   </head>
   <body>
+    <div class="scroll-progress" aria-hidden="true">
+      <div class="scroll-progress__bar" data-scroll-progress></div>
+    </div>
     <slot />
     <script is:inline>
       (() => {
+        const setupScrollProgress = () => {
+          const bar = document.querySelector("[data-scroll-progress]");
+          if (!bar) return;
+
+          const update = () => {
+            const max = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = max > 0 ? Math.min(window.scrollY / max, 1) : 0;
+            bar.style.width = `${progress * 100}%`;
+          };
+
+          if (document.body.dataset.scrollProgressReady === "true") {
+            update();
+            return;
+          }
+
+          document.body.dataset.scrollProgressReady = "true";
+          window.addEventListener("scroll", update, { passive: true });
+          window.addEventListener("resize", update);
+          update();
+        };
+
         const setupReveals = () => {
           const nodes = document.querySelectorAll("[data-reveal]");
           if (!nodes.length) return;
@@ -225,14 +249,76 @@ const { title, description } = Astro.props;
           observer.observe(lane);
         };
 
+        const setupProjectDialogs = () => {
+          const dialogs = [...document.querySelectorAll("[data-project-dialog]")];
+          const openers = [...document.querySelectorAll("[data-project-open]")];
+          if (!dialogs.length || !openers.length) return;
+
+          if (document.body.dataset.projectDialogsReady !== "true") {
+            document.body.dataset.projectDialogsReady = "true";
+            const openerMap = new WeakMap();
+
+            openers.forEach((opener) => {
+              opener.addEventListener("click", () => {
+                const targetId = opener.getAttribute("data-project-open");
+                if (!targetId) return;
+                const dialog = document.getElementById(targetId);
+                if (!(dialog instanceof HTMLDialogElement)) return;
+                openerMap.set(dialog, opener);
+                opener.setAttribute("aria-expanded", "true");
+                document.body.style.overflow = "hidden";
+                dialog.showModal();
+                requestAnimationFrame(() => {
+                  const closeButton = dialog.querySelector("[data-project-close]");
+                  if (closeButton instanceof HTMLElement) {
+                    closeButton.focus();
+                  }
+                });
+              });
+            });
+
+            dialogs.forEach((dialog) => {
+              if (!(dialog instanceof HTMLDialogElement)) return;
+
+              dialog.addEventListener("click", (event) => {
+                const panel = dialog.querySelector(".project-dialog__panel");
+                if (panel && !panel.contains(event.target)) {
+                  dialog.close();
+                }
+              });
+
+              dialog.querySelectorAll("[data-project-close]").forEach((button) => {
+                button.addEventListener("click", () => dialog.close());
+              });
+
+              dialog.addEventListener("close", () => {
+                document.body.style.removeProperty("overflow");
+                const opener = openerMap.get(dialog);
+                if (opener instanceof HTMLElement) {
+                  opener.setAttribute("aria-expanded", "false");
+                  opener.focus();
+                }
+              });
+
+              dialog.addEventListener("cancel", () => {
+                document.body.style.removeProperty("overflow");
+              });
+            });
+          }
+        };
+
+        document.addEventListener("DOMContentLoaded", setupScrollProgress);
         document.addEventListener("DOMContentLoaded", setupReveals);
         document.addEventListener("DOMContentLoaded", setupActiveNav);
         document.addEventListener("DOMContentLoaded", setupCountups);
         document.addEventListener("DOMContentLoaded", setupLanePulse);
+        document.addEventListener("DOMContentLoaded", setupProjectDialogs);
+        document.addEventListener("astro:page-load", setupScrollProgress);
         document.addEventListener("astro:page-load", setupReveals);
         document.addEventListener("astro:page-load", setupActiveNav);
         document.addEventListener("astro:page-load", setupCountups);
         document.addEventListener("astro:page-load", setupLanePulse);
+        document.addEventListener("astro:page-load", setupProjectDialogs);
       })();
     </script>
   </body>

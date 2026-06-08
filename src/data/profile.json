@@ -1,10 +1,10 @@
 {
   "amogh": {
     "name": "Amogh Jayasimha",
-    "headline": "Platform Engineer building reliable Kubernetes delivery systems, GitOps promotion pipelines, and failure-aware cloud platforms.",
+    "headline": "Platform engineer focused on safer release paths, Kubernetes reliability, and infrastructure that holds up under production change.",
     "location": "Boston, Massachusetts",
-    "shortBio": "I build platform systems that make risky production changes boring: faster deploys, safer promotions, better observability, and fewer failure surprises.",
-    "longBio": "Amogh Jayasimha is a DevOps and Site Reliability engineer focused on Kubernetes platforms, GitOps delivery, and production hardening. His recent work spans GKE platform ownership, CI acceleration, stateful incident recovery, mTLS rollouts, policy-driven supply chain security, and a chaos-gated promotion pipeline that blocks production until the system survives live fault injection under load.",
+    "shortBio": "I build release paths, cluster guardrails, and infrastructure workflows that let teams ship faster without turning production into a gamble.",
+    "longBio": "Amogh Jayasimha is a platform and site reliability engineer focused on Kubernetes operations, GitOps delivery, and production hardening. His recent work spans GKE platform ownership, CI acceleration, stateful incident recovery, mTLS rollouts, supply chain policy enforcement, and a chaos-gated promotion pipeline that blocks production until a system survives live fault injection under load.",
     "links": {
       "github": "https://github.com/amoghjay",
       "linkedin": "https://www.linkedin.com/in/amogh-jayasimha",

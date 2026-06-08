@@ -3,9 +3,9 @@
     "id": "k8s-chaos-promotion",
     "title": "Chaos-Gated GitOps Promotion on GKE",
     "repo": "amoghjay/k8s-chaos-promotion",
-    "summary": "A Kubernetes delivery platform where staging cannot promote to production unless the application survives live Chaos Mesh failure injection under k6 load.",
+    "summary": "The pipeline blocks staging from reaching production. The only way through is surviving real failure - pod kills, network latency, RPC outages - under live load, with real payments processing.",
     "problem": "Most pipelines prove that manifests apply. They do not prove that payment-critical workloads still behave correctly when pods die, dependencies slow down, or network conditions degrade during promotion.",
-    "approach": "Built a GKE-based GitOps stack with ArgoCD, Kargo, Helm, ESO, Prometheus, Loki, and Chaos Mesh. The promotion design treats failure testing as a release gate, not a post-release exercise, and pairs it with real payment flow behavior instead of toy traffic.",
+    "approach": "Failure testing is a release gate here, not a post-release exercise. Built on ArgoCD, Kargo, Chaos Mesh, and Prometheus - with real payment traffic, not synthetic load.",
     "impact": "Created a public reference architecture for reliability-gated promotion, backed by measurable x402/Permit2 latency improvements and a live failure-testing workflow designed to stop fragile releases before production.",
     "stack": [
       "GKE",
@@ -24,9 +24,9 @@
     "featured": true,
     "order": 1,
     "proofPoints": [
-      "No production promotion until chaos verification passes",
-      "2.5x end-to-end payment latency improvement after x402/Permit2 migration",
-      "Real GKE environment, real on-chain settlement, real failure modes"
+      "No prior public implementation of this Kargo + Chaos Mesh promotion gate pattern exists",
+      "Staging is hard-blocked from prod until chaos verification passes - no override, no workaround",
+      "x402/Permit2 migration cut end-to-end p95 from 1.8s to 700ms - 2.5x faster, simpler failure modes"
     ]
   },
   {
