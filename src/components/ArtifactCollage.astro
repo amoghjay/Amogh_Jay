@@ -21,33 +21,21 @@ const operatingLane = [
 ---
 
 <div class="artifact-collage" aria-hidden="true">
-  <article class="artifact artifact--memo">
-    <p class="artifact__eyebrow">release brief / selected artifact</p>
-    <h3>Safer delivery, clearer signals</h3>
-    <p>
-      Platform work here is about release safety, observability, and predictable operations across
-      Kubernetes environments, not just shipping manifests faster.
-    </p>
-    <div class="artifact__stamp">platform systems with proof</div>
-  </article>
-
-  <article class="artifact artifact--portrait">
+  <article class="artifact artifact--profile">
     <img src={photoSrc} alt="Portrait of Amogh Jayasimha." />
-    <div class="artifact__portrait-meta">
-      <p class="artifact__eyebrow">operator / profile</p>
-      <span>Boston · platform focus</span>
-    </div>
-  </article>
-
-  <article class="artifact artifact--rail">
-    <p class="artifact__eyebrow">stack in rotation</p>
-    <div class="artifact__logos">
-      {tools.map((tool) => (
-        <span>
-          <img src={tool.icon} alt="" loading="lazy" />
-          {tool.name}
-        </span>
-      ))}
+    <div class="artifact__profile-body">
+      <div class="artifact__profile-meta">
+        <p class="artifact__eyebrow">operator / profile</p>
+        <span>Boston · platform focus</span>
+      </div>
+      <div class="artifact__logos">
+        {tools.map((tool) => (
+          <span>
+            <img src={tool.icon} alt="" loading="lazy" />
+            {tool.name}
+          </span>
+        ))}
+      </div>
     </div>
   </article>
 

@@ -30,24 +30,6 @@ const impactSignals = [
   { label: "payment latency", value: "2.5x", note: "faster end-to-end flow" },
   { label: "migration scale", value: "200+", note: "legacy servers automated" }
 ];
-
-const credibilitySignals = [
-  "Kyverno showcase reference",
-  "x402 + Permit2 integration",
-  "PCI-DSS production background",
-  "GKE + GitOps ownership",
-  "CKA in progress"
-];
-
-const currentFocus = [
-  "platform reliability",
-  "CKA prep",
-  "autoscaling prep",
-  "Go + KEDA",
-  "technical writing in progress"
-];
-
-const operatingLoop = ["build", "promote", "observe", "recover"];
 const resumeHref = `${import.meta.env.BASE_URL}resume/amogh-jayasimha-resume.pdf`;
 
 const flagship = enrichedProjects[0];
@@ -169,25 +151,10 @@ const compactSkills = skills.map((domain) => ({
           Recent work includes faster config-only deploys, platform hardening across GKE, and
           production-focused work in policy, identity, observability, and safe delivery.
         </p>
-        <div class="focus-strip">
-          <span class="focus-strip__label">Current focus</span>
-          <div class="focus-strip__items">
-            {currentFocus.map((item) => <span>{item}</span>)}
-          </div>
-        </div>
-        <div class="operating-loop" aria-label="Platform operating loop">
-          <span class="operating-loop__label">Operating loop</span>
-          <div class="operating-loop__steps">
-            {operatingLoop.map((step) => <span>{step}</span>)}
-          </div>
-        </div>
         <div class="hero__actions">
           <a class="button button--primary" href="#work">Selected work</a>
-          <a class="button button--ghost" href={profile.links.github} target="_blank" rel="noreferrer">
-            GitHub
-          </a>
-          <a class="button button--ghost" href={profile.links.linkedin} target="_blank" rel="noreferrer">
-            LinkedIn
+          <a class="button button--ghost" href={resumeHref} target="_blank" rel="noreferrer">
+            Resume
           </a>
         </div>
         <dl class="stat-row">
@@ -199,12 +166,6 @@ const compactSkills = skills.map((domain) => ({
             </div>
           ))}
         </dl>
-        <div class="cred-strip" aria-label="Credibility highlights">
-          <span class="cred-strip__label">Selected proof</span>
-          <div class="cred-strip__items">
-            {credibilitySignals.map((item) => <span>{item}</span>)}
-          </div>
-        </div>
       </div>
 
       <div class="hero__visual">
