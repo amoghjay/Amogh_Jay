@@ -417,9 +417,10 @@ nav a[data-active="true"] {
   margin: 0 0 1rem;
   color: var(--accent);
   font-family: "IBM Plex Mono", monospace;
-  font-size: 0.8rem;
+  font-size: 1.05rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.04em;
 }
 
 .eyebrow::before {
@@ -433,9 +434,9 @@ h1 {
   max-width: 8.2ch;
   font-family: "Newsreader", serif;
   font-weight: 600;
-  font-size: clamp(3.45rem, 6.6vw, 5.9rem);
-  line-height: 0.92;
-  letter-spacing: -0.06em;
+  font-size: clamp(2.85rem, 5.25vw, 4.75rem);
+  line-height: 1;
+  letter-spacing: -0.035em;
   text-wrap: balance;
 }
 
@@ -553,8 +554,9 @@ nav a:hover {
 .artifact__sheet-head p {
   color: var(--ink-muted);
   font-family: "IBM Plex Mono", monospace;
-  font-size: 0.74rem;
-  letter-spacing: 0.08em;
+  font-size: 0.94rem;
+  font-weight: 600;
+  letter-spacing: 0.045em;
   text-transform: uppercase;
 }
 
@@ -702,6 +704,29 @@ nav a:hover {
   text-transform: uppercase;
 }
 
+.artifact__identity {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.artifact__identity h2 {
+  max-width: 12ch;
+  font-family: "Newsreader", serif;
+  font-size: clamp(1.9rem, 3vw, 2.65rem);
+  font-weight: 600;
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+}
+
+.artifact__identity p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 .artifact__logos {
   display: flex;
   flex-wrap: wrap;
@@ -723,10 +748,12 @@ nav a:hover {
 }
 
 .artifact__logos img {
-  width: 0.95rem;
-  height: 0.95rem;
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 1rem;
   display: block;
   object-fit: contain;
+  border-radius: 0;
 }
 
 .artifact__sheet-head {
@@ -1370,13 +1397,11 @@ button:focus-visible {
   object-fit: contain;
 }
 
-.artifact__logos img,
 .chip img,
 .stack-card__tools img {
   border-radius: 0.22rem;
 }
 
-:root[data-theme="dark"] .artifact__logos img,
 :root[data-theme="dark"] .chip img,
 :root[data-theme="dark"] .stack-card__tools img {
   padding: 0.08rem;
@@ -1468,6 +1493,14 @@ button:focus-visible {
   justify-content: space-between;
   gap: 0.8rem;
   align-items: center;
+}
+
+.writing-card__cta {
+  width: fit-content;
+  min-height: 2.55rem;
+  margin-top: 1rem;
+  padding: 0 0.9rem;
+  font-size: 0.9rem;
 }
 
 .writing-card__status {
@@ -1758,6 +1791,10 @@ button:focus-visible {
     gap: 1.4rem;
   }
 
+  .eyebrow {
+    font-size: 0.96rem;
+  }
+
   .hero__lede {
     font-size: 1rem;
   }
@@ -1804,8 +1841,8 @@ button:focus-visible {
 
   h1 {
     max-width: 8.5ch;
-    font-size: clamp(2.2rem, 10.6vw, 3rem);
-    line-height: 0.96;
+    font-size: clamp(1.95rem, 8.8vw, 2.55rem);
+    line-height: 1;
   }
 
   .section-intro {
@@ -1895,6 +1932,7 @@ button:focus-visible {
     width: 100%;
     min-width: 0;
     justify-content: flex-start;
+    overflow: hidden;
     padding: 0.62rem 0.75rem;
   }
 
@@ -2020,7 +2058,11 @@ button:focus-visible {
 
   h1 {
     max-width: 8.9ch;
-    font-size: clamp(2.05rem, 9.8vw, 2.55rem);
+    font-size: clamp(1.82rem, 8.4vw, 2.22rem);
+  }
+
+  .eyebrow {
+    font-size: 0.9rem;
   }
 
   .hero__lede {
@@ -2060,7 +2102,7 @@ button:focus-visible {
   }
 
   .stat dt {
-    font-size: 0.62rem;
+    font-size: 0.72rem;
     letter-spacing: 0.06em;
   }
 
@@ -2081,6 +2123,16 @@ button:focus-visible {
     gap: 0.7rem;
   }
 
+  .artifact__identity h2 {
+    max-width: 100%;
+    font-size: clamp(1.65rem, 8vw, 2.05rem);
+    line-height: 1.02;
+  }
+
+  .artifact__identity p {
+    font-size: 0.78rem;
+  }
+
   .artifact__logos {
     grid-template-columns: 1fr 1fr;
     gap: 0.5rem;
@@ -2094,6 +2146,12 @@ button:focus-visible {
 
   .artifact__logos span {
     padding: 0.55rem 0.62rem;
+  }
+
+  .artifact__logos img {
+    width: 0.95rem;
+    height: 0.95rem;
+    flex-basis: 0.95rem;
   }
 
   .stack-card h3 {
