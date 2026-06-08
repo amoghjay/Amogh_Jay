@@ -1,5 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <rect width="64" height="64" rx="18" fill="#09111f"/>
-  <rect x="7" y="7" width="50" height="50" rx="14" stroke="#67D3C1" stroke-opacity=".35"/>
-  <path d="M20 42V22h8.2l6 11.2L40.1 22H44v20h-3.8V28.4L34 40h-.5l-6.1-11.6V42H20Z" fill="#EFF6FF"/>
+  <rect width="64" height="64" rx="18" fill="#14273B" />
+  <rect x="7" y="7" width="50" height="50" rx="14" stroke="#2F9D92" stroke-opacity="0.3" />
+  <text
+    x="32"
+    y="38"
+    fill="#FFF8F0"
+    font-family="IBM Plex Mono, ui-monospace, SFMono-Regular, Menlo, monospace"
+    font-size="20"
+    font-weight="600"
+    letter-spacing="-1.2"
+    text-anchor="middle"
+  >
+    AJ
+  </text>
 </svg>
