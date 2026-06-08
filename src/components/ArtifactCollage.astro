@@ -65,8 +65,8 @@ const operatingLane = [
         <span>staging -> verification -> promotion</span>
       </div>
       <div class="artifact__lane-steps">
-        {operatingLane.map((step) => (
-          <span>
+        {operatingLane.map((step, index) => (
+          <span data-lane-step style={`--lane-step-delay: ${index * 140}ms;`}>
             <strong>{step.label}</strong>
             <small>{step.note}</small>
           </span>

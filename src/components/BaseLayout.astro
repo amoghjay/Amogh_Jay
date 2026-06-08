@@ -67,8 +67,172 @@ const { title, description } = Astro.props;
           });
         };
 
+        const setupActiveNav = () => {
+          const sections = [...document.querySelectorAll("section[id]")];
+          const links = [...document.querySelectorAll("[data-nav-link]")];
+          if (!sections.length || !links.length) return;
+
+          const byId = new Map(links.map((link) => [link.getAttribute("data-nav-link"), link]));
+
+          const setActive = (id) => {
+            links.forEach((link) => link.removeAttribute("data-active"));
+            const active = byId.get(id);
+            if (active) active.setAttribute("data-active", "true");
+          };
+
+          const updateActive = () => {
+            const marker = window.innerHeight * 0.28;
+            let currentId = sections[0]?.getAttribute("id") ?? null;
+
+            sections.forEach((section) => {
+              const rect = section.getBoundingClientRect();
+              if (rect.top <= marker && rect.bottom >= marker) {
+                currentId = section.getAttribute("id");
+              }
+            });
+
+            if (currentId) setActive(currentId);
+          };
+
+          let ticking = false;
+          const requestUpdate = () => {
+            if (ticking) return;
+            ticking = true;
+            requestAnimationFrame(() => {
+              updateActive();
+              ticking = false;
+            });
+          };
+
+          window.addEventListener("scroll", requestUpdate, { passive: true });
+          window.addEventListener("resize", requestUpdate);
+          updateActive();
+        };
+
+        const setupCountups = () => {
+          const items = document.querySelectorAll("[data-countup]");
+          if (!items.length) return;
+
+          if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            return;
+          }
+
+          const parseValue = (value) => {
+            const hasPercent = value.includes("%");
+            const hasPlus = value.includes("+");
+            const hasX = value.toLowerCase().includes("x");
+            const numeric = parseFloat(value.replace(/[^0-9.]/g, ""));
+            return { numeric, hasPercent, hasPlus, hasX };
+          };
+
+          const formatValue = ({ numeric, hasPercent, hasPlus, hasX }, current) => {
+            if (hasX) return `${current.toFixed(1)}x`;
+            const rounded = Number.isInteger(numeric) ? Math.round(current).toString() : current.toFixed(1);
+            if (hasPercent) return `${rounded}%`;
+            if (hasPlus) return `${rounded}+`;
+            return rounded;
+          };
+
+          const observer = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((entry) => {
+                if (!entry.isIntersecting) return;
+                const node = entry.target;
+                if (node.dataset.counted === "true") return;
+                node.dataset.counted = "true";
+
+                const original = node.textContent?.trim() ?? "";
+                const meta = parseValue(original);
+                if (!meta.numeric) return;
+
+                const start = performance.now();
+                const duration = 900;
+
+                const tick = (now) => {
+                  const progress = Math.min((now - start) / duration, 1);
+                  const eased = 1 - Math.pow(1 - progress, 3);
+                  const current = meta.numeric * eased;
+                  node.textContent = formatValue(meta, current);
+                  if (progress < 1) requestAnimationFrame(tick);
+                };
+
+                requestAnimationFrame(tick);
+                observer.unobserve(node);
+              });
+            },
+            { threshold: 0.45 }
+          );
+
+          items.forEach((item) => observer.observe(item));
+        };
+
+        const setupLanePulse = () => {
+          const lane = document.querySelector(".artifact__lane");
+          if (!lane || lane.dataset.laneReady === "true") return;
+
+          lane.dataset.laneReady = "true";
+          const steps = [...lane.querySelectorAll("[data-lane-step]")];
+          if (!steps.length) return;
+
+          if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            steps[0]?.setAttribute("data-live", "true");
+            return;
+          }
+
+          let timer = null;
+          let index = 0;
+
+          const activate = (activeIndex) => {
+            steps.forEach((step, stepIndex) => {
+              if (stepIndex === activeIndex) {
+                step.setAttribute("data-live", "true");
+              } else {
+                step.removeAttribute("data-live");
+              }
+            });
+          };
+
+          const start = () => {
+            if (timer) return;
+            activate(index);
+            timer = window.setInterval(() => {
+              index = (index + 1) % steps.length;
+              activate(index);
+            }, 1350);
+          };
+
+          const stop = () => {
+            if (timer) {
+              window.clearInterval(timer);
+              timer = null;
+            }
+            steps.forEach((step) => step.removeAttribute("data-live"));
+          };
+
+          const observer = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                  start();
+                } else {
+                  stop();
+                }
+              });
+            },
+            { threshold: 0.35 }
+          );
+
+          observer.observe(lane);
+        };
+
         document.addEventListener("DOMContentLoaded", setupReveals);
+        document.addEventListener("DOMContentLoaded", setupActiveNav);
+        document.addEventListener("DOMContentLoaded", setupCountups);
+        document.addEventListener("DOMContentLoaded", setupLanePulse);
         document.addEventListener("astro:page-load", setupReveals);
+        document.addEventListener("astro:page-load", setupActiveNav);
+        document.addEventListener("astro:page-load", setupCountups);
+        document.addEventListener("astro:page-load", setupLanePulse);
       })();
     </script>
   </body>

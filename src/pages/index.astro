@@ -118,10 +118,10 @@ const compactSkills = skills.map((domain) => ({
         <span>{profile.name}</span>
       </a>
       <nav>
-        <a href="#work">Work</a>
-        <a href="#experience">Experience</a>
-        <a href="#stack">Stack</a>
-        <a href="#contact">Contact</a>
+        <a href="#work" data-nav-link="work">Work</a>
+        <a href="#experience" data-nav-link="experience">Experience</a>
+        <a href="#stack" data-nav-link="stack">Stack</a>
+        <a href="#contact" data-nav-link="contact">Contact</a>
       </nav>
       <div class="topbar__actions">
         <a class="topbar__icon" href={profile.links.github} target="_blank" rel="noreferrer" aria-label="GitHub">
@@ -161,7 +161,7 @@ const compactSkills = skills.map((domain) => ({
           {impactSignals.map((signal) => (
             <div class="stat">
               <dt>{signal.label}</dt>
-              <dd>{signal.value}</dd>
+              <dd data-countup>{signal.value}</dd>
               <p>{signal.note}</p>
             </div>
           ))}
