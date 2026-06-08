@@ -140,9 +140,9 @@ const compactSkills = skills.map((domain) => ({
     </header>
 
     <section class="hero" id="top">
-      <div class="hero__copy">
+      <div class="hero__copy" data-reveal="hero-left">
         <p class="eyebrow">DevOps · SRE · Platform engineering</p>
-        <h1>Quiet confidence for production systems.</h1>
+        <h1>Safer delivery for production systems.</h1>
         <p class="hero__lede">
           I build Kubernetes platforms, GitOps delivery paths, and reliability guardrails that make
           production changes safer without slowing teams down.
@@ -168,18 +168,18 @@ const compactSkills = skills.map((domain) => ({
         </dl>
       </div>
 
-      <div class="hero__visual">
+      <div class="hero__visual" data-reveal="hero-right" data-delay="90">
         <ArtifactCollage photoSrc={profilePhoto.src} />
       </div>
     </section>
 
     <section class="section" id="work">
-      <div class="section-intro">
+      <div class="section-intro" data-reveal data-delay="40">
         <p class="eyebrow">Selected work</p>
         <h2>Platform-first work with proof, not just tooling.</h2>
       </div>
 
-      <article class="flagship surface">
+      <article class="flagship surface" data-reveal data-delay="80">
         <div class="flagship__header">
           <div>
             <p class="project-label">Flagship project</p>
@@ -242,8 +242,8 @@ const compactSkills = skills.map((domain) => ({
       </article>
 
       <div class="project-list">
-        {supportingProjects.map((project) => (
-          <article class="project-tile surface">
+        {supportingProjects.map((project, index) => (
+          <article class="project-tile surface" data-reveal data-delay={120 + index * 70}>
             <div class="project-tile__header">
               <div>
                 <p class="project-label">{project.status}</p>
@@ -301,14 +301,14 @@ const compactSkills = skills.map((domain) => ({
     </section>
 
     <section class="section" id="experience">
-      <div class="section-intro">
+      <div class="section-intro" data-reveal>
         <p class="eyebrow">Experience</p>
         <h2>Operational work with visible outcomes.</h2>
       </div>
 
       <div class="case-list">
-        {caseStudyEntries.map((entry) => (
-          <article class="case surface">
+        {caseStudyEntries.map((entry, index) => (
+          <article class="case surface" data-reveal data-delay={index * 70}>
             <div class="case__header">
               <div>
                 <p class="project-label">{entry.data.company}</p>
@@ -332,14 +332,14 @@ const compactSkills = skills.map((domain) => ({
     </section>
 
     <section class="section" id="stack">
-      <div class="section-intro">
+      <div class="section-intro" data-reveal>
         <p class="eyebrow">Stack</p>
         <h2>Grouped by operating domain, not by badge wall.</h2>
       </div>
 
         <div class="stack-grid">
-          {compactSkills.map((domain) => (
-            <article class="stack-card">
+          {compactSkills.map((domain, index) => (
+            <article class="stack-card" data-reveal data-delay={index * 45}>
               <div class="stack-card__header">
                 {domain.domainIcon && <img src={domain.domainIcon} alt="" loading="lazy" />}
                 <h3>{domain.name}</h3>
@@ -359,13 +359,13 @@ const compactSkills = skills.map((domain) => ({
     </section>
 
     <section class="section" id="writing">
-      <div class="section-intro">
+      <div class="section-intro" data-reveal>
         <p class="eyebrow">Platform Notes</p>
         <h2>Case studies and build notes that support the work.</h2>
       </div>
 
       <div class="writing-grid">
-        <article class="writing-card surface">
+        <article class="writing-card surface" data-reveal>
           <p class="project-label">Published</p>
           <h3>Kubernetes supply chain security demo</h3>
           <p>
@@ -377,7 +377,7 @@ const compactSkills = skills.map((domain) => ({
           </a>
         </article>
 
-        <article class="writing-card surface">
+        <article class="writing-card surface" data-reveal data-delay="70">
           <p class="project-label">In progress</p>
           <h3>Platform case study series</h3>
           <p>
@@ -390,7 +390,7 @@ const compactSkills = skills.map((domain) => ({
     </section>
 
     <section class="section section--contact" id="contact">
-      <div class="contact-card">
+      <div class="contact-card" data-reveal>
         <div class="contact-card__identity">
           <p class="project-label">Amogh Jayasimha</p>
           <h3>Platform / SRE engineer building reliable delivery systems.</h3>

@@ -49,6 +49,40 @@ body::before {
   mask-image: linear-gradient(180deg, rgba(255, 255, 255, 0.82), transparent);
 }
 
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(24px);
+  filter: saturate(0.94);
+  transition:
+    opacity 620ms ease,
+    transform 620ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 620ms ease;
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+[data-reveal="hero-left"] {
+  transform: translate3d(-22px, 16px, 0);
+}
+
+[data-reveal="hero-right"] {
+  transform: translate3d(22px, 18px, 0);
+}
+
+[data-reveal].is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  filter: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    transition: none;
+  }
+}
+
 a {
   color: inherit;
   text-decoration: none;
@@ -222,6 +256,9 @@ h1 {
   margin: 0.9rem 0 0;
   max-width: 30rem;
   color: var(--ink-muted);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.86rem;
+  line-height: 1.75;
 }
 
 .hero__actions,
@@ -397,7 +434,7 @@ nav a:hover {
 
 .artifact__signal span {
   display: block;
-  color: var(--ink);
+  color: var(--accent);
   font-family: "IBM Plex Mono", monospace;
   font-size: 0.8rem;
   letter-spacing: 0.06em;
@@ -457,7 +494,7 @@ nav a:hover {
 }
 
 .artifact__lane-steps strong {
-  color: var(--accent);
+  color: var(--ink);
   font-family: "IBM Plex Mono", monospace;
   font-size: 0.8rem;
   letter-spacing: 0.05em;

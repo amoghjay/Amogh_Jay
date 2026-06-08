@@ -32,5 +32,44 @@ const { title, description } = Astro.props;
   </head>
   <body>
     <slot />
+    <script is:inline>
+      (() => {
+        const setupReveals = () => {
+          const nodes = document.querySelectorAll("[data-reveal]");
+          if (!nodes.length) return;
+
+          if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            nodes.forEach((node) => node.classList.add("is-visible"));
+            return;
+          }
+
+          const observer = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((entry) => {
+                if (!entry.isIntersecting) return;
+                entry.target.classList.add("is-visible");
+                observer.unobserve(entry.target);
+              });
+            },
+            {
+              threshold: 0.16,
+              rootMargin: "0px 0px -8% 0px"
+            }
+          );
+
+          nodes.forEach((node) => {
+            if (node.dataset.revealReady === "true") return;
+            node.dataset.revealReady = "true";
+            if (node.dataset.delay) {
+              node.style.setProperty("--reveal-delay", `${node.dataset.delay}ms`);
+            }
+            observer.observe(node);
+          });
+        };
+
+        document.addEventListener("DOMContentLoaded", setupReveals);
+        document.addEventListener("astro:page-load", setupReveals);
+      })();
+    </script>
   </body>
 </html>
