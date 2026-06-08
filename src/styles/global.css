@@ -984,6 +984,7 @@ nav a:hover {
   .hero {
     grid-template-columns: 1fr;
     min-height: auto;
+    gap: 1.8rem;
   }
 }
 
@@ -997,6 +998,18 @@ nav a:hover {
   .stack-grid,
   .writing-grid {
     grid-template-columns: 1fr;
+  }
+
+  .section {
+    margin-top: 3.8rem;
+  }
+
+  .hero__copy {
+    max-width: 100%;
+  }
+
+  .hero__visual {
+    max-width: 42rem;
   }
 
   .artifact--profile {
@@ -1029,26 +1042,89 @@ nav a:hover {
     padding-top: 0.8rem;
   }
 
-  .topbar,
-  nav,
-  .flagship__header,
-  .project-tile__header,
-  .case__header,
-  .contact-card {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
   .topbar {
     grid-template-columns: 1fr;
+    gap: 0.85rem;
+    padding: 0.9rem 1rem;
+    top: 0.5rem;
   }
 
   nav {
     justify-content: flex-start;
+    gap: 0.85rem;
+  }
+
+  nav a {
+    font-size: 0.82rem;
   }
 
   .topbar__actions {
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    width: 100%;
+    gap: 0.55rem;
+  }
+
+  .topbar__resume {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-width: 0;
+    padding: 0;
+  }
+
+  .hero {
+    gap: 1.1rem;
+  }
+
+  .hero__lede {
+    font-size: 0.98rem;
+  }
+
+  .hero__sublede {
+    font-size: 0.78rem;
+    line-height: 1.6;
+  }
+
+  .hero__actions {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.6rem;
+  }
+
+  .hero__actions .button {
+    width: 100%;
+  }
+
+  h1 {
+    max-width: 6.8ch;
+    font-size: clamp(2.45rem, 12.2vw, 3.3rem);
+    line-height: 0.96;
+  }
+
+  .stat-row {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .flagship__header,
+  .project-tile__header,
+  .case__header,
+  .contact-card,
+  .artifact__lane-head,
+  .contact-card__profile {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .artifact__profile-body,
+  .contact-card__body,
+  .contact-links--stacked {
+    width: 100%;
+  }
+
+  .artifact__lane-head {
+    gap: 0.35rem;
   }
 
   .contact-link {
@@ -1056,12 +1132,64 @@ nav a:hover {
     width: 100%;
   }
 
-  h1 {
-    max-width: 8ch;
-    font-size: 4rem;
+  .contact-card__body h2 {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 560px) {
+  .shell {
+    width: min(calc(100% - 0.75rem), var(--shell));
   }
 
-  .stat-row {
-    grid-template-columns: 1fr;
+  .topbar {
+    border-radius: 1.4rem;
+  }
+
+  .brand {
+    gap: 0.7rem;
+    font-size: 0.95rem;
+  }
+
+  .brand__mark {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+
+  .topbar__icon {
+    width: 100%;
+    min-height: 2.45rem;
+  }
+
+  .topbar__resume {
+    font-size: 0.76rem;
+  }
+
+  .section {
+    margin-top: 3.1rem;
+  }
+
+  .artifact--sheet,
+  .artifact--profile,
+  .flagship,
+  .project-tile,
+  .case,
+  .writing-card,
+  .contact-card {
+    padding: 1rem;
+  }
+
+  .artifact__signal,
+  .policy-node,
+  .gallery-card figcaption,
+  .project-tile__artifact figcaption {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  .artifact__logos span,
+  .stack-card__tools span,
+  .chip {
+    font-size: 0.8rem;
   }
 }
