@@ -2,7 +2,7 @@
 import { getCollection } from "astro:content";
 import BaseLayout from "../components/BaseLayout.astro";
 import ArtifactCollage from "../components/ArtifactCollage.astro";
-import { getRepoSnapshots } from "../lib/github";
+import { formatRepoTimestamp, getRepoSnapshots } from "../lib/github";
 import "../styles/global.css";
 import profilePhoto from "../../assets/PHOTO-2026-04-29-23-03-06.jpg";
 import grafanaOverview from "../../assets/Screenshot 2026-05-29 at 1.13.15 PM.png";
@@ -31,9 +31,45 @@ const impactSignals = [
   { label: "migration scale", value: "200+", note: "legacy servers automated" }
 ];
 const resumeHref = `${import.meta.env.BASE_URL}resume/amogh-jayasimha-resume.pdf`;
+const mediumWriteupHref =
+  "https://medium.com/@amoghjay2000/i-built-a-kubernetes-supply-chain-security-demo-heres-why-and-how-2e2f878ef684";
 
 const flagship = enrichedProjects[0];
 const supportingProjects = enrichedProjects.slice(1);
+
+const aboutHighlights = [
+  "Small to mid-size platform teams where release speed and operational safety are both unsolved at the same time.",
+  "Problems that live between infrastructure, developer workflow, and reliability, not deep inside one narrow layer.",
+  "Teams that want their platform to stay understandable under pressure, not just functional on a good day."
+];
+
+const writingNotes = [
+  {
+    label: "Published",
+    tone: "live",
+    title: "Kubernetes supply chain security demo",
+    description:
+      "Why I built it, how the trust policy works, and what makes it useful as a platform-security reference instead of another throwaway cluster demo.",
+    href: mediumWriteupHref,
+    cta: "Read on Medium"
+  },
+  {
+    label: "In progress",
+    tone: "draft",
+    title: "Chaos-gated promotion case study",
+    description:
+      "A deeper walkthrough of the release gate design, what gets verified before promotion, and the operational tradeoffs behind that model.",
+    status: "drafting now"
+  },
+  {
+    label: "Short note",
+    tone: "note",
+    title: "What good platform work should feel like",
+    description:
+      "Fast paths for safe changes, rollback behavior that makes sense under pressure, and observability that answers questions before incidents turn into guesswork.",
+    status: "living principle"
+  }
+];
 
 function getPrimaryTools(tools: string[]) {
   return tools.slice(0, 6);
@@ -115,9 +151,10 @@ const compactSkills = skills.map((domain) => ({
     <header class="topbar">
       <a class="brand" href="#top">
         <span class="brand__mark">AJ</span>
-        <span>{profile.name}</span>
+        <span class="brand__name">{profile.name}</span>
       </a>
       <nav>
+        <a href="#about" data-nav-link="about">About</a>
         <a href="#work" data-nav-link="work">Work</a>
         <a href="#experience" data-nav-link="experience">Experience</a>
         <a href="#stack" data-nav-link="stack">Stack</a>
@@ -144,18 +181,24 @@ const compactSkills = skills.map((domain) => ({
         <p class="eyebrow">DevOps · SRE · Platform engineering</p>
         <h1>Safer delivery for production systems.</h1>
         <p class="hero__lede">
-          I build Kubernetes platforms, GitOps delivery paths, and reliability guardrails that make
-          production changes safer without slowing teams down.
+          I build Kubernetes platforms, GitOps promotion paths, and infrastructure guardrails that let
+          teams move faster without making production fragile.
         </p>
         <p class="hero__sublede">
-          Recent work includes faster config-only deploys, platform hardening across GKE, and
-          production-focused work in policy, identity, observability, and safe delivery.
+          Recent work spans 2-minute config-only deploys, chaos-gated promotion on GKE, cluster trust
+          policy, and stateful recovery work shaped by real incidents.
         </p>
         <div class="hero__actions">
           <a class="button button--primary" href="#work">Selected work</a>
           <a class="button button--ghost" href={resumeHref} target="_blank" rel="noreferrer">
             Resume
           </a>
+        </div>
+        <div class="hero__badge-row">
+          <span class="status-pill status-pill--live">
+            <span class="status-pill__dot"></span>
+            Open to platform / SRE roles
+          </span>
         </div>
         <dl class="stat-row">
           {impactSignals.map((signal) => (
@@ -173,10 +216,45 @@ const compactSkills = skills.map((domain) => ({
       </div>
     </section>
 
+    <section class="section about" id="about">
+      <div class="section-intro" data-reveal>
+        <p class="eyebrow">About Me</p>
+        <h2>I work in the messy layer between shipping code and keeping production calm.</h2>
+      </div>
+
+      <div class="about-grid">
+        <article class="about-card surface" data-reveal data-delay="40">
+          <p class="project-label">How I work</p>
+          <p>
+            I build the release paths, cluster guardrails, and identity layers that let teams ship
+            without treating production like a gamble.
+          </p>
+          <p>
+            I care less about the tools than about what they actually change. Does this promotion
+            rule prevent a bad deploy from reaching prod? Does a rollback take seconds or minutes?
+            If a platform change doesn't move one of those needles, it probably isn't finished.
+          </p>
+        </article>
+
+        <article class="about-card surface" data-reveal data-delay="90">
+          <p class="project-label">Best fit</p>
+          <div class="about-points">
+            {aboutHighlights.map((item) => <p>{item}</p>)}
+          </div>
+          <div class="about-tags">
+            <span class="status-pill">Kubernetes</span>
+            <span class="status-pill">GitOps</span>
+            <span class="status-pill">Reliability</span>
+            <span class="status-pill">Infrastructure</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
     <section class="section" id="work">
       <div class="section-intro" data-reveal data-delay="40">
         <p class="eyebrow">Selected work</p>
-        <h2>Platform-first work with proof, not just tooling.</h2>
+        <h2>Platform work with real operational proof, not just tooling screenshots.</h2>
       </div>
 
       <article class="flagship surface" data-reveal data-delay="80">
@@ -185,61 +263,125 @@ const compactSkills = skills.map((domain) => ({
             <p class="project-label">Flagship project</p>
             <h3>{flagship.title}</h3>
           </div>
+          {flagship.github && <p class="repo-meta">Updated {formatRepoTimestamp(flagship.github.updatedAt)}</p>}
         </div>
 
         <p class="flagship__summary">{flagship.summary}</p>
+        <p class="flagship__hint">Preview only. Open the full case study for the release gate, dashboard evidence, and rollout decisions.</p>
 
-        <div class="flagship__grid">
+        <div class="flagship__preview">
           <div class="flagship__artifact">
-            <p class="project-label">why it matters</p>
+            <p class="project-label">Why it matters</p>
             <ul class="flagship__artifact-list">
-              {flagship.proofPoints.map((point) => <li>{point}</li>)}
+              {flagship.proofPoints.slice(0, 2).map((point) => <li>{point}</li>)}
             </ul>
           </div>
-          <div>
-            <p class="flagship__body">{flagship.approach}</p>
-            <div class="flagship__note">
-              <p class="project-label">Differentiator</p>
-              <p>
-                This platform also carries a real payment-protocol migration: I replaced a custom
-                receipt-polling path with standard x402 plus Permit2 through the Radius facilitator,
-                cutting end-to-end p95 from about 1.8s to about 700ms while simplifying the hot path
-                and changing the operational failure modes.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div class="flagship__gallery">
-          <figure class="gallery-card gallery-card--large">
+          <figure class="gallery-card flagship__preview-card">
             <img src={grafanaSettlement.src} alt="Grafana dashboard showing payment settlement outcomes and end-to-end latency." />
             <figcaption>Settlement health and latency traces from the payment flow.</figcaption>
           </figure>
-          <figure class="gallery-card">
-            <img src={grafanaOverview.src} alt="Grafana dashboard showing request rates, p95 latency, and response code distribution." />
-            <figcaption>Application overview across request rate, latency, and response codes.</figcaption>
-          </figure>
-          <figure class="gallery-card">
-            <img src={grafanaSigner.src} alt="Grafana dashboard showing Permit2 signer success rate and duration." />
-            <figcaption>Permit2 signer success and wallet approval visibility.</figcaption>
-          </figure>
         </div>
 
-        <div class="chip-list">
-          {flagship.stack.map((item) => (
-            <span class="chip">
-              {toolIconMap[item] && <img src={toolIconMap[item]} alt="" loading="lazy" />}
-              {item}
-            </span>
-          ))}
-        </div>
+        <div class="project-card__footer project-card__footer--flagship">
+          <div class="project-tile__actions">
+            <button
+              class="button button--primary project-tile__button"
+              type="button"
+              data-project-open={`dialog-${flagship.id}`}
+              aria-haspopup="dialog"
+              aria-controls={`dialog-${flagship.id}`}
+            >
+              Open case study
+            </button>
+            {flagship.repo && (
+              <a class="text-link" href={`https://github.com/${flagship.repo}`} target="_blank" rel="noreferrer">
+                View repository
+              </a>
+            )}
+          </div>
 
-        {flagship.repo && (
-          <a class="text-link" href={`https://github.com/${flagship.repo}`} target="_blank" rel="noreferrer">
-            View repository
-          </a>
-        )}
+          <div class="chip-list">
+            {flagship.stack.slice(0, 6).map((item) => (
+              <span class="chip">
+                {toolIconMap[item] && <img src={toolIconMap[item]} alt="" loading="lazy" />}
+                {item}
+              </span>
+            ))}
+          </div>
+        </div>
       </article>
+
+      <dialog class="project-dialog" id={`dialog-${flagship.id}`} data-project-dialog>
+        <article class="project-dialog__panel">
+          <button class="project-dialog__close" type="button" aria-label="Close project details" data-project-close>
+            <span aria-hidden="true">×</span>
+          </button>
+          <div class="project-dialog__header">
+            <div>
+              <p class="project-label">Flagship project</p>
+              <h3>{flagship.title}</h3>
+            </div>
+            {flagship.github && <p class="repo-meta">Updated {formatRepoTimestamp(flagship.github.updatedAt)}</p>}
+          </div>
+
+          <p class="project-dialog__summary">{flagship.summary}</p>
+
+          <div class="project-dialog__grid">
+            <section class="project-dialog__section">
+              <p class="project-label">Why it matters</p>
+              <ul class="flagship__artifact-list">
+                {flagship.proofPoints.map((point) => <li>{point}</li>)}
+              </ul>
+            </section>
+            <section class="project-dialog__section">
+              <p class="project-label">Approach</p>
+              <p>{flagship.approach}</p>
+            </section>
+          </div>
+
+          <section class="project-dialog__section project-dialog__section--impact">
+            <p class="project-label">Differentiator</p>
+            <p>
+              This is the only publicly documented implementation of Chaos Mesh wired as a Kargo
+              promotion gate. It also carries a real protocol migration - replacing a custom
+              receipt-polling path with x402/Permit2 through the Radius facilitator, which cut p95
+              from 1.8s to 700ms and reduced failure modes from 9 to 6.
+            </p>
+          </section>
+
+          <div class="flagship__gallery">
+            <figure class="gallery-card gallery-card--large">
+              <img src={grafanaSettlement.src} alt="Grafana dashboard showing payment settlement outcomes and end-to-end latency." />
+              <figcaption>Settlement health and latency traces from the payment flow.</figcaption>
+            </figure>
+            <figure class="gallery-card">
+              <img src={grafanaOverview.src} alt="Grafana dashboard showing request rates, p95 latency, and response code distribution." />
+              <figcaption>Application overview across request rate, latency, and response codes.</figcaption>
+            </figure>
+            <figure class="gallery-card">
+              <img src={grafanaSigner.src} alt="Grafana dashboard showing Permit2 signer success rate and duration." />
+              <figcaption>Signer health and wallet balance across load test runs.</figcaption>
+            </figure>
+          </div>
+
+          <div class="chip-list">
+            {flagship.stack.map((item) => (
+              <span class="chip">
+                {toolIconMap[item] && <img src={toolIconMap[item]} alt="" loading="lazy" />}
+                {item}
+              </span>
+            ))}
+          </div>
+
+          <div class="project-dialog__actions">
+            {flagship.repo && (
+              <a class="button button--primary" href={`https://github.com/${flagship.repo}`} target="_blank" rel="noreferrer">
+                View repository
+              </a>
+            )}
+          </div>
+        </article>
+      </dialog>
 
       <div class="project-list">
         {supportingProjects.map((project, index) => (
@@ -249,9 +391,60 @@ const compactSkills = skills.map((domain) => ({
                 <p class="project-label">{project.status}</p>
                 <h3>{project.title}</h3>
               </div>
+              {project.github && <p class="repo-meta">Updated {formatRepoTimestamp(project.github.updatedAt)}</p>}
             </div>
+            <p class="project-tile__summary">{project.summary}</p>
+            <p class="project-tile__hint">Short version here. Open the case study for the full decisions, tradeoffs, and operational context.</p>
+            <div class="project-tile__proof">
+              {project.proofPoints.slice(0, 1).map((point) => <p>{point}</p>)}
+            </div>
+            <div class="project-card__footer">
+              <div class="project-tile__actions">
+                <button
+                  class="button button--primary project-tile__button"
+                  type="button"
+                  data-project-open={`dialog-${project.id}`}
+                  aria-haspopup="dialog"
+                  aria-controls={`dialog-${project.id}`}
+                >
+                  Open case study
+                </button>
+                {project.repo && (
+                  <a class="text-link" href={`https://github.com/${project.repo}`} target="_blank" rel="noreferrer">
+                    View repository
+                  </a>
+                )}
+              </div>
+              <div class="chip-list">
+                {project.stack.slice(0, 4).map((item) => (
+                  <span class="chip">
+                    {toolIconMap[item] && <img src={toolIconMap[item]} alt="" loading="lazy" />}
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      {supportingProjects.map((project) => (
+        <dialog class="project-dialog" id={`dialog-${project.id}`} data-project-dialog>
+          <article class="project-dialog__panel">
+            <button class="project-dialog__close" type="button" aria-label="Close project details" data-project-close>
+              <span aria-hidden="true">×</span>
+            </button>
+            <div class="project-dialog__header">
+              <div>
+                <p class="project-label">{project.status}</p>
+                <h3>{project.title}</h3>
+              </div>
+              {project.github && <p class="repo-meta">Updated {formatRepoTimestamp(project.github.updatedAt)}</p>}
+            </div>
+            <p class="project-dialog__summary">{project.summary}</p>
+
             {project.id === "k8s-supply-chain-security" && (
-              <div class="project-tile__artifact project-tile__artifact--policy" aria-label="Supply chain verification flow">
+              <div class="project-dialog__artifact project-tile__artifact project-tile__artifact--policy" aria-label="Supply chain verification flow">
                 <div class="policy-flow">
                   <div class="policy-node">
                     <span class="policy-node__eyebrow">CI</span>
@@ -275,35 +468,64 @@ const compactSkills = skills.map((domain) => ({
                 </div>
               </div>
             )}
+
             {supportingArtifacts[project.id] && (
-              <figure class="project-tile__artifact">
+              <figure class="project-dialog__artifact project-tile__artifact">
                 <img src={supportingArtifacts[project.id].src} alt={supportingArtifacts[project.id].alt} />
                 <figcaption>{supportingArtifacts[project.id].caption}</figcaption>
               </figure>
             )}
-            <p>{project.summary}</p>
+
+            <div class="project-dialog__grid">
+              <section class="project-dialog__section">
+                <p class="project-label">Problem</p>
+                <p>{project.problem}</p>
+              </section>
+              <section class="project-dialog__section">
+                <p class="project-label">Approach</p>
+                <p>{project.approach}</p>
+              </section>
+            </div>
+
+            <section class="project-dialog__section project-dialog__section--impact">
+              <p class="project-label">Impact</p>
+              <p>{project.impact}</p>
+            </section>
+
+            <div class="project-dialog__proof">
+              {project.proofPoints.map((point) => <p>{point}</p>)}
+            </div>
+
             <div class="chip-list">
-              {project.stack.slice(0, 5).map((item) => (
+              {project.stack.map((item) => (
                 <span class="chip">
                   {toolIconMap[item] && <img src={toolIconMap[item]} alt="" loading="lazy" />}
                   {item}
                 </span>
               ))}
             </div>
-            {project.repo && (
-              <a class="text-link" href={`https://github.com/${project.repo}`} target="_blank" rel="noreferrer">
-                View repository
-              </a>
-            )}
+
+            <div class="project-dialog__actions">
+              {project.repo && (
+                <a class="button button--primary" href={`https://github.com/${project.repo}`} target="_blank" rel="noreferrer">
+                  View repository
+                </a>
+              )}
+              {project.github?.homepage && (
+                <a class="button button--ghost" href={project.github.homepage} target="_blank" rel="noreferrer">
+                  Open live project
+                </a>
+              )}
+            </div>
           </article>
-        ))}
-      </div>
+        </dialog>
+      ))}
     </section>
 
     <section class="section" id="experience">
       <div class="section-intro" data-reveal>
         <p class="eyebrow">Experience</p>
-        <h2>Operational work with visible outcomes.</h2>
+        <h2>Experience shaping release safety, migration speed, and infrastructure reliability.</h2>
       </div>
 
       <div class="case-list">
@@ -334,7 +556,7 @@ const compactSkills = skills.map((domain) => ({
     <section class="section" id="stack">
       <div class="section-intro" data-reveal>
         <p class="eyebrow">Tech Stack</p>
-        <h2>Tools I use across platform, Kubernetes, delivery, observability, security, and automation.</h2>
+        <h2>The tools I reach for when the job is safer deploys, better cluster operations, and fewer production surprises.</h2>
       </div>
 
         <div class="stack-grid">
@@ -361,31 +583,29 @@ const compactSkills = skills.map((domain) => ({
     <section class="section" id="writing">
       <div class="section-intro" data-reveal>
         <p class="eyebrow">Platform Notes</p>
-        <h2>Case studies and build notes that support the work.</h2>
+        <h2>Notes from the parts of platform work that are easier to build than to explain.</h2>
       </div>
 
       <div class="writing-grid">
-        <article class="writing-card surface" data-reveal>
-          <p class="project-label">Published</p>
-          <h3>Kubernetes supply chain security demo</h3>
-          <p>
-            Why I built it, how the policies work, and what makes it a useful platform-security
-            reference instead of just another cluster demo.
-          </p>
-          <a class="text-link" href="https://medium.com/@amoghjay2000/i-built-a-kubernetes-supply-chain-security-demo-heres-why-and-how-2e2f878ef684" target="_blank" rel="noreferrer">
-            Read on Medium
-          </a>
-        </article>
-
-        <article class="writing-card surface" data-reveal data-delay="70">
-          <p class="project-label">In progress</p>
-          <h3>Platform case study series</h3>
-          <p>
-            A deeper write-up on the chaos project, release verification, and the broader platform
-            decisions behind the system.
-          </p>
-          <span class="writing-card__status">drafting now</span>
-        </article>
+        {writingNotes.map((item, index) => (
+          <article class="writing-card surface" data-reveal data-delay={index * 60}>
+            <div class="writing-card__topline">
+              <p class="project-label">{item.label}</p>
+              <span class={`status-pill ${item.tone === "live" ? "status-pill--live" : ""}`}>
+                {item.tone}
+              </span>
+            </div>
+            <h3>{item.title}</h3>
+            <p>{item.description}</p>
+            {item.href ? (
+              <a class="text-link" href={item.href} target="_blank" rel="noreferrer">
+                {item.cta}
+              </a>
+            ) : (
+              <span class="writing-card__status">{item.status}</span>
+            )}
+          </article>
+        ))}
       </div>
     </section>
 
@@ -399,7 +619,8 @@ const compactSkills = skills.map((domain) => ({
           <p class="eyebrow">Get in touch</p>
           <h2>Open to platform, SRE, and infrastructure roles.</h2>
           <p>
-            Best fit: teams where platform work needs to hold up under change, failure, and real production load.
+            Best fit: teams where platform work needs to hold up under change, failure, and real
+            production load.
           </p>
         </div>
         <div class="contact-links contact-links--stacked">
