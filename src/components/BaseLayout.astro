@@ -16,7 +16,7 @@ const { title, description } = Astro.props;
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#09111f" />
+    <meta name="theme-color" content="#f8f2ea" data-theme-color />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
@@ -28,6 +28,20 @@ const { title, description } = Astro.props;
       href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,400;6..72,600;6..72,700&display=swap"
       rel="stylesheet"
     />
+    <script is:inline>
+      (() => {
+        const storageKey = "amoghjay-theme";
+        const getSystemTheme = () =>
+          window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+
+        try {
+          const storedTheme = window.localStorage.getItem(storageKey);
+          document.documentElement.dataset.theme = storedTheme || getSystemTheme();
+        } catch {
+          document.documentElement.dataset.theme = getSystemTheme();
+        }
+      })();
+    </script>
     <ClientRouter />
   </head>
   <body>
@@ -37,6 +51,58 @@ const { title, description } = Astro.props;
     <slot />
     <script is:inline>
       (() => {
+        const storageKey = "amoghjay-theme";
+
+        const getSystemTheme = () =>
+          window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+
+        const getStoredTheme = () => {
+          try {
+            return window.localStorage.getItem(storageKey);
+          } catch {
+            return null;
+          }
+        };
+
+        const setStoredTheme = (theme) => {
+          try {
+            window.localStorage.setItem(storageKey, theme);
+          } catch {
+            // Theme preference is an enhancement; ignore storage failures.
+          }
+        };
+
+        const applyTheme = (theme, { persist = false } = {}) => {
+          const nextTheme = theme === "dark" ? "dark" : "light";
+          document.documentElement.dataset.theme = nextTheme;
+          if (persist) setStoredTheme(nextTheme);
+
+          const metaThemeColor = document.querySelector("[data-theme-color]");
+          if (metaThemeColor) {
+            metaThemeColor.setAttribute("content", nextTheme === "dark" ? "#091018" : "#f8f2ea");
+          }
+
+          document.querySelectorAll("[data-theme-toggle]").forEach((button) => {
+            const isDark = nextTheme === "dark";
+            button.setAttribute("aria-pressed", String(isDark));
+            button.setAttribute("aria-label", isDark ? "Switch to light mode" : "Switch to dark mode");
+          });
+        };
+
+        const setupThemeToggle = () => {
+          const initialTheme = getStoredTheme() || document.documentElement.dataset.theme || getSystemTheme();
+          applyTheme(initialTheme);
+
+          document.querySelectorAll("[data-theme-toggle]").forEach((button) => {
+            if (button.dataset.themeReady === "true") return;
+            button.dataset.themeReady = "true";
+            button.addEventListener("click", () => {
+              const currentTheme = document.documentElement.dataset.theme === "dark" ? "dark" : "light";
+              applyTheme(currentTheme === "dark" ? "light" : "dark", { persist: true });
+            });
+          });
+        };
+
         const setupScrollProgress = () => {
           const bar = document.querySelector("[data-scroll-progress]");
           if (!bar) return;
@@ -307,12 +373,14 @@ const { title, description } = Astro.props;
           }
         };
 
+        document.addEventListener("DOMContentLoaded", setupThemeToggle);
         document.addEventListener("DOMContentLoaded", setupScrollProgress);
         document.addEventListener("DOMContentLoaded", setupReveals);
         document.addEventListener("DOMContentLoaded", setupActiveNav);
         document.addEventListener("DOMContentLoaded", setupCountups);
         document.addEventListener("DOMContentLoaded", setupLanePulse);
         document.addEventListener("DOMContentLoaded", setupProjectDialogs);
+        document.addEventListener("astro:page-load", setupThemeToggle);
         document.addEventListener("astro:page-load", setupScrollProgress);
         document.addEventListener("astro:page-load", setupReveals);
         document.addEventListener("astro:page-load", setupActiveNav);
