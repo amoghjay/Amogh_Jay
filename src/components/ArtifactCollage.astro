@@ -6,10 +6,10 @@ interface Props {
 const { photoSrc } = Astro.props;
 
 const tools = [
-  { name: "Kubernetes", icon: "https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/kubernetes.svg" },
-  { name: "Terraform", icon: "https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/terraform.svg" },
-  { name: "ArgoCD", icon: "https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/argo.svg" },
-  { name: "Prometheus", icon: "https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/prometheus.svg" }
+  { name: "Kubernetes", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/kubernetes/kubernetes-plain.svg" },
+  { name: "Terraform", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/terraform/terraform-original.svg" },
+  { name: "ArgoCD", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/argocd/argocd-original.svg" },
+  { name: "Prometheus", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/prometheus/prometheus-original.svg" }
 ];
 
 const operatingLane = [
@@ -27,6 +27,10 @@ const operatingLane = [
       <div class="artifact__profile-meta">
         <p class="artifact__eyebrow">operator / profile</p>
         <span>Boston · platform focus</span>
+      </div>
+      <div class="artifact__identity">
+        <h2>Amogh Jayasimha</h2>
+        <p>Platform / SRE engineer</p>
       </div>
       <div class="artifact__logos">
         {tools.map((tool) => (

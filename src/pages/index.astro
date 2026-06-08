@@ -30,6 +30,7 @@ const impactSignals = [
   { label: "payment latency", value: "2.5x", note: "faster end-to-end flow" },
   { label: "migration scale", value: "200+", note: "legacy servers automated" }
 ];
+const operationalSignals = ["SLO-aware deploys", "chaos-gated promotion", "signed image policy", "rollback-ready paths"];
 const resumeHref = `${import.meta.env.BASE_URL}resume/amogh-jayasimha-resume.pdf`;
 const mediumWriteupHref =
   "https://medium.com/@amoghjay2000/i-built-a-kubernetes-supply-chain-security-demo-heres-why-and-how-2e2f878ef684";
@@ -76,24 +77,24 @@ function getPrimaryTools(tools: string[]) {
 }
 
 const toolIconMap: Record<string, string | null> = {
-  "GKE": "https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/googlecloud.svg",
-  "AWS": "https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/amazonwebservices.svg",
-  "GCP": "https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/googlecloud.svg",
-  "OpenStack": "https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/openstack.svg",
-  "Terraform": "https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/terraform.svg",
-  "Ansible": "https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/ansible.svg",
-  "Packer": "https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/packer.svg",
-  "Kubernetes": "https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/kubernetes.svg",
-  "Helm": "https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/helm.svg",
+  "GKE": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/googlecloud/googlecloud-original.svg",
+  "AWS": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/amazonwebservices/amazonwebservices-original-wordmark.svg",
+  "GCP": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/googlecloud/googlecloud-original.svg",
+  "OpenStack": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/openstack/openstack-original.svg",
+  "Terraform": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/terraform/terraform-original.svg",
+  "Ansible": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/ansible/ansible-original.svg",
+  "Packer": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/packer/packer-original.svg",
+  "Kubernetes": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/kubernetes/kubernetes-plain.svg",
+  "Helm": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/helm/helm-original.svg",
   "KEDA": null,
   "cert-manager": null,
-  "ArgoCD": "https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/argo.svg",
+  "ArgoCD": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/argocd/argocd-original.svg",
   "Kargo": null,
-  "GitHub Actions": "https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/githubactions.svg",
+  "GitHub Actions": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/githubactions/githubactions-original.svg",
   "OIDC": null,
   "Artifact Registry": null,
-  "Prometheus": "https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/prometheus.svg",
-  "Grafana": "https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/grafana.svg",
+  "Prometheus": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/prometheus/prometheus-original.svg",
+  "Grafana": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/grafana/grafana-original.svg",
   "Loki": null,
   "CloudWatch": null,
   "Kyverno": null,
@@ -102,19 +103,19 @@ const toolIconMap: Record<string, string | null> = {
   "External Secrets Operator": null,
   "Workload Identity Federation": null,
   "Secret Manager": null,
-  "Python": "https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/python.svg",
-  "Go": "https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/go.svg",
-  "Bash": "https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/gnubash.svg",
+  "Python": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg",
+  "Go": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/go/go-original.svg",
+  "Bash": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/bash/bash-original.svg",
   "PowerShell": null,
-  "JavaScript": "https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/javascript.svg",
-  "PostgreSQL": "https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/postgresql.svg",
-  "Redis": "https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/redis.svg",
-  "FastAPI": "https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/fastapi.svg",
-  "Airflow": "https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/apacheairflow.svg",
+  "JavaScript": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg",
+  "PostgreSQL": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/postgresql/postgresql-original.svg",
+  "Redis": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/redis/redis-original.svg",
+  "FastAPI": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/fastapi/fastapi-original.svg",
+  "Airflow": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/apacheairflow/apacheairflow-original.svg",
   "SSM": null,
   "RDS": null,
-  "Flask": "https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/flask.svg",
-  "MySQL": "https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/mysql.svg"
+  "Flask": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/flask/flask-original.svg",
+  "MySQL": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/mysql/mysql-original.svg"
 };
 
 const supportingArtifacts: Record<string, { src: string; alt: string; caption: string }> = {
@@ -170,6 +171,14 @@ const compactSkills = skills.map((domain) => ({
         <a class="topbar__icon" href={`mailto:${profile.links.email}`} aria-label="Email">
           <img src="https://cdn.jsdelivr.net/npm/lucide-static@0.542.0/icons/mail.svg" alt="" loading="lazy" />
         </a>
+        <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark mode" aria-pressed="false">
+          <span class="theme-toggle__icon theme-toggle__icon--moon" aria-hidden="true">
+            <img src="https://cdn.jsdelivr.net/npm/lucide-static@0.542.0/icons/moon.svg" alt="" loading="lazy" />
+          </span>
+          <span class="theme-toggle__icon theme-toggle__icon--sun" aria-hidden="true">
+            <img src="https://cdn.jsdelivr.net/npm/lucide-static@0.542.0/icons/sun.svg" alt="" loading="lazy" />
+          </span>
+        </button>
         <a class="topbar__resume" href={resumeHref} target="_blank" rel="noreferrer">
           Resume
         </a>
@@ -199,6 +208,11 @@ const compactSkills = skills.map((domain) => ({
             <span class="status-pill__dot"></span>
             Open to platform / SRE roles
           </span>
+        </div>
+        <div class="ops-strip" aria-label="Operational focus areas">
+          {operationalSignals.map((signal) => (
+            <span>{signal}</span>
+          ))}
         </div>
         <dl class="stat-row">
           {impactSignals.map((signal) => (
@@ -598,7 +612,7 @@ const compactSkills = skills.map((domain) => ({
             <h3>{item.title}</h3>
             <p>{item.description}</p>
             {item.href ? (
-              <a class="text-link" href={item.href} target="_blank" rel="noreferrer">
+              <a class="button button--primary writing-card__cta" href={item.href} target="_blank" rel="noreferrer">
                 {item.cta}
               </a>
             ) : (
