@@ -1,9 +1,24 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "amoghjay-portfolio",
+  "main": "./worker/index.js",
   "compatibility_date": "2026-06-08",
   "assets": {
     "directory": "./dist",
+    "binding": "ASSETS",
+    "run_worker_first": [
+      "/api/*"
+    ],
     "not_found_handling": "404-page"
+  },
+  "send_email": [
+    {
+      "name": "CONTACT_EMAIL",
+      "destination_address": "amoghjay.us@gmail.com"
+    }
+  ],
+  "vars": {
+    "CONTACT_FROM": "contact@amoghjay.dev",
+    "CONTACT_TO": "amoghjay.us@gmail.com"
   }
 }
