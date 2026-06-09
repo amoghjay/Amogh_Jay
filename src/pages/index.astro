@@ -168,9 +168,10 @@ const compactSkills = skills.map((domain) => ({
         <a class="topbar__icon" href={profile.links.linkedin} target="_blank" rel="noreferrer" aria-label="LinkedIn">
           <img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/linkedin.svg" alt="" loading="lazy" />
         </a>
-        <a class="topbar__icon" href={`mailto:${profile.links.email}`} aria-label="Email">
+        <button class="topbar__contact" type="button" data-contact-open aria-haspopup="dialog" aria-controls="contact-dialog" aria-label="Open contact form">
           <img src="https://cdn.jsdelivr.net/npm/lucide-static@0.542.0/icons/mail.svg" alt="" loading="lazy" />
-        </a>
+          <span>Contact</span>
+        </button>
         <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark mode" aria-pressed="false">
           <span class="theme-toggle__icon theme-toggle__icon--moon" aria-hidden="true">
             <img src="https://cdn.jsdelivr.net/npm/lucide-static@0.542.0/icons/moon.svg" alt="" loading="lazy" />
@@ -199,6 +200,9 @@ const compactSkills = skills.map((domain) => ({
         </p>
         <div class="hero__actions">
           <a class="button button--primary" href="#work">Selected work</a>
+          <button class="button button--ghost" type="button" data-contact-open aria-haspopup="dialog" aria-controls="contact-dialog">
+            Contact me
+          </button>
           <a class="button button--ghost" href={resumeHref} target="_blank" rel="noreferrer">
             Resume
           </a>
@@ -638,7 +642,7 @@ const compactSkills = skills.map((domain) => ({
           </p>
         </div>
         <div class="contact-links contact-links--stacked">
-          <a class="contact-link contact-link--primary" href={`mailto:${profile.links.email}`}>
+          <button class="contact-link contact-link--primary" type="button" data-contact-open aria-haspopup="dialog" aria-controls="contact-dialog">
             <span class="contact-link__mark">
               <img src="https://cdn.jsdelivr.net/npm/lucide-static@0.542.0/icons/mail.svg" alt="" loading="lazy" />
             </span>
@@ -646,7 +650,7 @@ const compactSkills = skills.map((domain) => ({
               <strong>Email</strong>
               <small>{profile.links.email}</small>
             </span>
-          </a>
+          </button>
           <a class="contact-link" href={profile.links.linkedin} target="_blank" rel="noreferrer">
             <span class="contact-link__mark">
               <img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/linkedin.svg" alt="" loading="lazy" />
@@ -668,5 +672,78 @@ const compactSkills = skills.map((domain) => ({
         </div>
       </div>
     </section>
+
+    <dialog class="contact-dialog" id="contact-dialog" data-contact-dialog>
+      <article class="contact-dialog__panel">
+        <button class="project-dialog__close" type="button" aria-label="Close contact form" data-contact-close>
+          <span aria-hidden="true">×</span>
+        </button>
+
+        <div class="contact-dialog__header">
+          <p class="eyebrow">Let's Connect</p>
+          <h3>Let’s Connect!</h3>
+          <p>
+            I’m always interested in discussing platform engineering, reliability work, and teams
+            trying to make production calmer.
+          </p>
+        </div>
+
+        <div class="contact-dialog__meta">
+          <div class="contact-dialog__meta-item">
+            <span class="contact-dialog__meta-icon">
+              <img src="https://cdn.jsdelivr.net/npm/lucide-static@0.542.0/icons/mail.svg" alt="" loading="lazy" />
+            </span>
+            <span>
+              <strong>Email</strong>
+              <small>{profile.links.email}</small>
+            </span>
+          </div>
+          <div class="contact-dialog__meta-item">
+            <span class="contact-dialog__meta-icon">
+              <img src="https://cdn.jsdelivr.net/npm/lucide-static@0.542.0/icons/map-pin.svg" alt="" loading="lazy" />
+            </span>
+            <span>
+              <strong>Location</strong>
+              <small>{profile.location}</small>
+            </span>
+          </div>
+        </div>
+
+        <form class="contact-form" data-contact-form novalidate>
+          <label class="contact-form__honeypot">
+            Website
+            <input name="website" type="text" tabindex="-1" autocomplete="off" />
+          </label>
+
+          <label>
+            <span>Name *</span>
+            <input name="name" type="text" autocomplete="name" placeholder="Your name" required />
+          </label>
+
+          <label>
+            <span>Email *</span>
+            <input name="email" type="email" autocomplete="email" placeholder="your.email@example.com" required />
+          </label>
+
+          <label>
+            <span>Subject</span>
+            <input name="subject" type="text" autocomplete="off" placeholder="What’s this about?" />
+          </label>
+
+          <label>
+            <span>Message *</span>
+            <textarea name="message" rows="7" placeholder="Tell me about your project, opportunity, or just say hi!" required></textarea>
+          </label>
+
+          <div class="contact-form__actions">
+            <p class="contact-form__status" data-contact-status role="status" aria-live="polite"></p>
+            <button class="button button--primary" type="submit">Send message</button>
+          </div>
+          <p class="contact-form__fallback">
+            Prefer email? <a href={`mailto:${profile.links.email}`}>{profile.links.email}</a>
+          </p>
+        </form>
+      </article>
+    </dialog>
   </main>
 </BaseLayout>
