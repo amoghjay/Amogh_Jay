@@ -1,0 +1,129 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../components/BaseLayout.astro";
+import "../styles/global.css";
+
+const [profileEntry] = await getCollection("profile");
+const profile = profileEntry.data;
+
+const portfolioHref = "https://portfolio.amoghjay.dev/";
+const resumeHref = `${import.meta.env.BASE_URL}resume/amogh-jayasimha-resume.pdf`;
+const qrSvgHref = `${import.meta.env.BASE_URL}share/portfolio-qr.svg`;
+const qrPngHref = `${import.meta.env.BASE_URL}share/portfolio-qr.png`;
+const homeHref = import.meta.env.BASE_URL;
+const emailHref = `mailto:${profile.links.email}`;
+---
+
+<BaseLayout
+  title="Share Amogh Jayasimha | Platform Engineering Portfolio"
+  description="QR share card for Amogh Jayasimha's platform engineering portfolio."
+>
+  <main class="shell share-page">
+    <header class="topbar share-topbar">
+      <a class="brand" href={homeHref}>
+        <span class="brand__mark">AJ</span>
+        <span class="brand__name">{profile.name}</span>
+      </a>
+      <nav aria-label="Share navigation">
+        <a href={homeHref}>Portfolio</a>
+        <a href={resumeHref} target="_blank" rel="noreferrer">Resume</a>
+      </nav>
+      <div class="topbar__actions">
+        <a class="topbar__icon" href={profile.links.github} target="_blank" rel="noreferrer" aria-label="GitHub">
+          <img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/github.svg" alt="" loading="lazy" />
+        </a>
+        <a class="topbar__icon" href={profile.links.linkedin} target="_blank" rel="noreferrer" aria-label="LinkedIn">
+          <img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/linkedin.svg" alt="" loading="lazy" />
+        </a>
+        <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark mode" aria-pressed="false">
+          <span class="theme-toggle__icon theme-toggle__icon--moon" aria-hidden="true">
+            <img src="https://cdn.jsdelivr.net/npm/lucide-static@0.542.0/icons/moon.svg" alt="" loading="lazy" />
+          </span>
+          <span class="theme-toggle__icon theme-toggle__icon--sun" aria-hidden="true">
+            <img src="https://cdn.jsdelivr.net/npm/lucide-static@0.542.0/icons/sun.svg" alt="" loading="lazy" />
+          </span>
+        </button>
+      </div>
+    </header>
+
+    <section class="share-hero" aria-labelledby="share-title">
+      <div class="share-hero__copy" data-reveal="hero-left">
+        <p class="eyebrow">PlatformCon NYC</p>
+        <h1 id="share-title">Amogh Jayasimha</h1>
+        <p class="share-hero__role">Platform Engineer</p>
+        <p class="share-hero__lede">
+          I build Kubernetes platforms, GitOps promotion paths, and reliability guardrails for safer production change.
+        </p>
+        <div class="share-hero__actions">
+          <a class="button button--primary" href={portfolioHref} target="_blank" rel="noreferrer">
+            Open portfolio
+          </a>
+          <a class="button button--ghost" href={profile.links.linkedin} target="_blank" rel="noreferrer">
+            LinkedIn
+          </a>
+          <a class="button button--ghost" href={resumeHref} target="_blank" rel="noreferrer">
+            Resume
+          </a>
+        </div>
+      </div>
+
+      <aside class="share-card surface" data-reveal="hero-right" data-delay="80" aria-label="Portfolio QR code">
+        <div class="share-card__qr-wrap">
+          <img class="share-card__qr" src={qrSvgHref} alt={`QR code for ${portfolioHref}`} width="720" height="720" />
+        </div>
+        <div class="share-card__details">
+          <p class="share-card__label">Scan to open</p>
+          <a class="share-card__url" href={portfolioHref} target="_blank" rel="noreferrer">{portfolioHref}</a>
+        </div>
+      </aside>
+    </section>
+
+    <section class="share-links" aria-label="Quick links" data-reveal>
+      <a class="contact-link contact-link--primary" href={portfolioHref} target="_blank" rel="noreferrer">
+        <span class="contact-link__mark">
+          <img src="https://cdn.jsdelivr.net/npm/lucide-static@0.542.0/icons/globe-2.svg" alt="" loading="lazy" />
+        </span>
+        <span class="contact-link__text">
+          <strong>Portfolio</strong>
+          <small>{portfolioHref}</small>
+        </span>
+      </a>
+      <a class="contact-link" href={profile.links.github} target="_blank" rel="noreferrer">
+        <span class="contact-link__mark">
+          <img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/github.svg" alt="" loading="lazy" />
+        </span>
+        <span class="contact-link__text">
+          <strong>GitHub</strong>
+          <small>amoghjay</small>
+        </span>
+      </a>
+      <a class="contact-link" href={profile.links.linkedin} target="_blank" rel="noreferrer">
+        <span class="contact-link__mark">
+          <img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/linkedin.svg" alt="" loading="lazy" />
+        </span>
+        <span class="contact-link__text">
+          <strong>LinkedIn</strong>
+          <small>amogh-jayasimha</small>
+        </span>
+      </a>
+      <a class="contact-link" href={emailHref}>
+        <span class="contact-link__mark">
+          <img src="https://cdn.jsdelivr.net/npm/lucide-static@0.542.0/icons/mail.svg" alt="" loading="lazy" />
+        </span>
+        <span class="contact-link__text">
+          <strong>Email</strong>
+          <small>{profile.links.email}</small>
+        </span>
+      </a>
+      <a class="contact-link" href={qrPngHref} download="amogh-jayasimha-portfolio-qr.png">
+        <span class="contact-link__mark">
+          <img src="https://cdn.jsdelivr.net/npm/lucide-static@0.542.0/icons/download.svg" alt="" loading="lazy" />
+        </span>
+        <span class="contact-link__text">
+          <strong>Download QR</strong>
+          <small>PNG for printing or Wallet pass reuse</small>
+        </span>
+      </a>
+    </section>
+  </main>
+</BaseLayout>
