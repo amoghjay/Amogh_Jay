@@ -1,5 +1,5 @@
 import { defineCollection } from "astro:content";
-import { file } from "astro/loaders";
+import { file, glob } from "astro/loaders";
 import { z } from "astro/zod";
 
 const profile = defineCollection({
@@ -75,10 +75,34 @@ const timeline = defineCollection({
   })
 });
 
+const blog = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/blog" }),
+  schema: ({ image }) =>
+    z.object({
+      title: z.string(),
+      description: z.string(),
+      pubDate: z.coerce.date(),
+      updatedDate: z.coerce.date().optional(),
+      tags: z.array(z.string()).default([]),
+      projectId: z.string().optional(),
+      cover: image().optional(),
+      coverAlt: z.string().optional(),
+      canonicalUrl: z.url().optional(),
+      featured: z.boolean().default(false),
+      draft: z.boolean().default(false),
+      externalUrl: z.url().optional(),
+      externalLabel: z.string().optional()
+    }).refine((post) => !post.cover || Boolean(post.coverAlt?.trim()), {
+      message: "coverAlt is required when a cover image is provided",
+      path: ["coverAlt"]
+    })
+});
+
 export const collections = {
   profile,
   featuredProjects,
   caseStudies,
   skills,
-  timeline
+  timeline,
+  blog
 };

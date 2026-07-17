@@ -1,0 +1,146 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../components/BaseLayout.astro";
+import { estimateReadingTime, formatPostDate, getBlogTags, getPostSlug, getPublishedBlogPosts, slugifyTag } from "../../lib/blog";
+import "../../styles/global.css";
+
+const [profileEntry] = await getCollection("profile");
+const profile = profileEntry.data;
+const posts = getPublishedBlogPosts(await getCollection("blog"));
+const featuredPost = posts.find((post) => post.data.featured) ?? posts[0];
+const remainingPosts = posts.filter((post) => post.id !== featuredPost?.id);
+const tags = getBlogTags(posts);
+
+const homeHref = import.meta.env.BASE_URL;
+const blogHref = `${import.meta.env.BASE_URL}blog/`;
+const resumeHref = `${import.meta.env.BASE_URL}resume/amogh-jayasimha-resume.pdf`;
+---
+
+<BaseLayout
+  title="Project Blog | Amogh Jayasimha"
+  description="Project writeups from Amogh Jayasimha on platform engineering, Kubernetes, GitOps, reliability, and infrastructure decisions."
+>
+  <main class="shell blog-shell">
+    <header class="topbar blog-topbar">
+      <a class="brand" href={homeHref}>
+        <span class="brand__mark">AJ</span>
+        <span class="brand__name">{profile.name}</span>
+      </a>
+      <nav aria-label="Blog navigation">
+        <a href={homeHref}>Portfolio</a>
+        <a href={`${homeHref}#work`}>Work</a>
+        <a href={blogHref} data-active="true">Blog</a>
+        <a href={`${homeHref}#contact`}>Contact</a>
+      </nav>
+      <div class="topbar__actions">
+        <a class="topbar__icon" href={profile.links.github} target="_blank" rel="noreferrer" aria-label="GitHub">
+          <img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/github.svg" alt="" loading="lazy" />
+        </a>
+        <a class="topbar__icon" href={profile.links.linkedin} target="_blank" rel="noreferrer" aria-label="LinkedIn">
+          <img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/linkedin.svg" alt="" loading="lazy" />
+        </a>
+        <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark mode" aria-pressed="false">
+          <span class="theme-toggle__icon theme-toggle__icon--moon" aria-hidden="true">
+            <img src="https://cdn.jsdelivr.net/npm/lucide-static@0.542.0/icons/moon.svg" alt="" loading="lazy" />
+          </span>
+          <span class="theme-toggle__icon theme-toggle__icon--sun" aria-hidden="true">
+            <img src="https://cdn.jsdelivr.net/npm/lucide-static@0.542.0/icons/sun.svg" alt="" loading="lazy" />
+          </span>
+        </button>
+        <a class="topbar__resume" href={resumeHref} target="_blank" rel="noreferrer">
+          Resume
+        </a>
+      </div>
+    </header>
+
+    <section class="blog-hero blog-hero--compact">
+      <p class="eyebrow">Project Writeups</p>
+      <h1>Notes from the systems I build.</h1>
+      <p>
+        Practical breakdowns of what I built, what broke, the commands that mattered, and the
+        tradeoffs I would make differently next time.
+      </p>
+      <div class="blog-hero__links">
+        <a class="text-link" href={`${homeHref}rss.xml`}>Subscribe via RSS</a>
+      </div>
+    </section>
+
+    {tags.length > 0 && (
+      <nav class="blog-filter" aria-label="Browse by topic">
+        <span>Topics</span>
+        {tags.map((tag) => <a href={`${blogHref}tags/${tag.slug}/`}>{tag.label}</a>)}
+      </nav>
+    )}
+
+    {featuredPost ? (
+      <>
+        <section class="blog-feature" aria-labelledby="latest-post-title">
+          {featuredPost.data.cover && (
+            <a class="blog-feature__cover" href={`${blogHref}${getPostSlug(featuredPost)}/`} tabindex="-1" aria-hidden="true">
+              <img
+                src={featuredPost.data.cover.src}
+                width={featuredPost.data.cover.width}
+                height={featuredPost.data.cover.height}
+                alt=""
+              />
+            </a>
+          )}
+          <div class="blog-feature__body">
+            <p class="project-label">{featuredPost.data.featured ? "Featured writeup" : "Latest writeup"}</p>
+            <div class="blog-feature__meta">
+              <span>{formatPostDate(featuredPost.data.pubDate)}</span>
+              <span>{estimateReadingTime(featuredPost.body)}</span>
+            </div>
+            <h2 id="latest-post-title">
+              <a href={`${blogHref}${getPostSlug(featuredPost)}/`}>{featuredPost.data.title}</a>
+            </h2>
+            <p>{featuredPost.data.description}</p>
+            <div class="blog-tags" aria-label="Post tags">
+              {featuredPost.data.tags.slice(0, 5).map((tag) => (
+                <a href={`${blogHref}tags/${slugifyTag(tag)}/`}>{tag}</a>
+              ))}
+            </div>
+            <a class="text-link blog-card__cta" href={`${blogHref}${getPostSlug(featuredPost)}/`}>
+              Read writeup
+            </a>
+          </div>
+        </section>
+
+        {remainingPosts.length > 0 && (
+          <section class="blog-index" aria-labelledby="more-writeups-title">
+            <h2 class="blog-index__heading" id="more-writeups-title">More writeups</h2>
+            <div class="blog-index__list">
+              {remainingPosts.map((post) => (
+            <article class="blog-index__item">
+              <div class="blog-index__meta">
+                <span>{formatPostDate(post.data.pubDate)}</span>
+                <span>{estimateReadingTime(post.body)}</span>
+              </div>
+              <h2 class="blog-index__title">
+                <a href={`${blogHref}${getPostSlug(post)}/`}>{post.data.title}</a>
+              </h2>
+              <p>{post.data.description}</p>
+              <div class="blog-index__footer">
+                <div class="blog-tags blog-tags--quiet" aria-label="Post tags">
+                  {post.data.tags.slice(0, 4).map((tag) => (
+                    <a href={`${blogHref}tags/${slugifyTag(tag)}/`}>{tag}</a>
+                  ))}
+                </div>
+                <a class="text-link blog-index__link" href={`${blogHref}${getPostSlug(post)}/`}>
+                  Read writeup
+                </a>
+              </div>
+            </article>
+              ))}
+            </div>
+          </section>
+        )}
+      </>
+    ) : (
+      <section class="blog-empty surface">
+        <h2>No published writeups yet.</h2>
+        <p>Drafts stay hidden until they are ready to be published.</p>
+      </section>
+    )}
+  </main>
+</BaseLayout>

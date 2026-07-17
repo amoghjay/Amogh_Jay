@@ -2,6 +2,7 @@
 import { getCollection } from "astro:content";
 import BaseLayout from "../components/BaseLayout.astro";
 import ArtifactCollage from "../components/ArtifactCollage.astro";
+import { estimateReadingTime, formatPostDate, getPostSlug, getPublishedBlogPosts } from "../lib/blog";
 import { formatRepoTimestamp, getRepoSnapshots } from "../lib/github";
 import "../styles/global.css";
 import profilePhoto from "../../assets/PHOTO-2026-04-29-23-03-06.jpg";
@@ -14,6 +15,7 @@ const [profileEntry] = await getCollection("profile");
 const [skillsEntry] = await getCollection("skills");
 const projectEntries = (await getCollection("featuredProjects")).sort((a, b) => a.data.order - b.data.order);
 const caseStudyEntries = await getCollection("caseStudies");
+const blogPosts = getPublishedBlogPosts(await getCollection("blog")).slice(0, 3);
 
 const profile = profileEntry.data;
 const skills = skillsEntry.data.domains;
@@ -32,8 +34,7 @@ const impactSignals = [
 ];
 const operationalSignals = ["SLO-aware deploys", "chaos-gated promotion", "signed image policy", "rollback-ready paths"];
 const resumeHref = `${import.meta.env.BASE_URL}resume/amogh-jayasimha-resume.pdf`;
-const mediumWriteupHref =
-  "https://medium.com/@amoghjay2000/i-built-a-kubernetes-supply-chain-security-demo-heres-why-and-how-2e2f878ef684";
+const blogHref = `${import.meta.env.BASE_URL}blog/`;
 
 const flagship = enrichedProjects[0];
 const supportingProjects = enrichedProjects.slice(1);
@@ -42,34 +43,6 @@ const aboutHighlights = [
   "Small to mid-size platform teams where release speed and operational safety are both unsolved at the same time.",
   "Problems that live between infrastructure, developer workflow, and reliability, not deep inside one narrow layer.",
   "Teams that want their platform to stay understandable under pressure, not just functional on a good day."
-];
-
-const writingNotes = [
-  {
-    label: "Published",
-    tone: "live",
-    title: "Kubernetes supply chain security demo",
-    description:
-      "Why I built it, how the trust policy works, and what makes it useful as a platform-security reference instead of another throwaway cluster demo.",
-    href: mediumWriteupHref,
-    cta: "Read on Medium"
-  },
-  {
-    label: "In progress",
-    tone: "draft",
-    title: "Chaos-gated promotion case study",
-    description:
-      "A deeper walkthrough of the release gate design, what gets verified before promotion, and the operational tradeoffs behind that model.",
-    status: "drafting now"
-  },
-  {
-    label: "Short note",
-    tone: "note",
-    title: "What good platform work should feel like",
-    description:
-      "Fast paths for safe changes, rollback behavior that makes sense under pressure, and observability that answers questions before incidents turn into guesswork.",
-    status: "living principle"
-  }
 ];
 
 function getPrimaryTools(tools: string[]) {
@@ -159,6 +132,7 @@ const compactSkills = skills.map((domain) => ({
         <a href="#work" data-nav-link="work">Work</a>
         <a href="#experience" data-nav-link="experience">Experience</a>
         <a href="#stack" data-nav-link="stack">Stack</a>
+        <a href="#writing" data-nav-link="writing">Blog</a>
         <a href="#contact" data-nav-link="contact">Contact</a>
       </nav>
       <div class="topbar__actions">
@@ -600,30 +574,43 @@ const compactSkills = skills.map((domain) => ({
 
     <section class="section" id="writing">
       <div class="section-intro" data-reveal>
-        <p class="eyebrow">Platform Notes</p>
-        <h2>Notes from the parts of platform work that are easier to build than to explain.</h2>
+        <p class="eyebrow">Project Blog</p>
+        <h2>Writeups on projects I built, broke, and finally got working.</h2>
       </div>
 
-      <div class="writing-grid">
-        {writingNotes.map((item, index) => (
+      {blogPosts.length > 0 ? (
+        <div class="writing-grid writing-grid--posts">
+          {blogPosts.map((post, index) => (
           <article class="writing-card surface" data-reveal data-delay={index * 60}>
             <div class="writing-card__topline">
-              <p class="project-label">{item.label}</p>
-              <span class={`status-pill ${item.tone === "live" ? "status-pill--live" : ""}`}>
-                {item.tone}
+              <p class="project-label">{formatPostDate(post.data.pubDate)}</p>
+              <span class="status-pill">
+                {estimateReadingTime(post.body)}
               </span>
             </div>
-            <h3>{item.title}</h3>
-            <p>{item.description}</p>
-            {item.href ? (
-              <a class="button button--primary writing-card__cta" href={item.href} target="_blank" rel="noreferrer">
-                {item.cta}
-              </a>
-            ) : (
-              <span class="writing-card__status">{item.status}</span>
-            )}
+            <h3>
+              <a href={`${blogHref}${getPostSlug(post)}/`}>{post.data.title}</a>
+            </h3>
+            <p>{post.data.description}</p>
+            <div class="blog-tags writing-card__tags" aria-label="Post tags">
+              {post.data.tags.slice(0, 4).map((tag) => <span>{tag}</span>)}
+            </div>
+            <a class="text-link writing-card__link" href={`${blogHref}${getPostSlug(post)}/`}>
+              Read field note
+            </a>
           </article>
-        ))}
+          ))}
+        </div>
+      ) : (
+        <article class="writing-card surface" data-reveal>
+          <p class="project-label">Drafting</p>
+          <h3>Project writeups are coming soon.</h3>
+          <p>Drafts stay hidden until they have real decisions, screenshots, and code worth showing.</p>
+        </article>
+      )}
+
+      <div class="writing-section__actions" data-reveal>
+        <a class="text-link" href={blogHref}>View all writeups</a>
       </div>
     </section>
 

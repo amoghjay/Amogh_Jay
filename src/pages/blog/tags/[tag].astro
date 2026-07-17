@@ -1,0 +1,92 @@
+---
+import { getCollection, type CollectionEntry } from "astro:content";
+import BaseLayout from "../../../components/BaseLayout.astro";
+import {
+  estimateReadingTime,
+  formatPostDate,
+  getBlogTags,
+  getPostSlug,
+  getPublishedBlogPosts,
+  slugifyTag
+} from "../../../lib/blog";
+import "../../../styles/global.css";
+
+export async function getStaticPaths() {
+  const posts = getPublishedBlogPosts(await getCollection("blog"));
+
+  return getBlogTags(posts).map((tag) => ({
+    params: { tag: tag.slug },
+    props: {
+      tag,
+      posts: posts.filter((post) => post.data.tags.some((item) => slugifyTag(item) === tag.slug))
+    }
+  }));
+}
+
+interface Props {
+  tag: { slug: string; label: string };
+  posts: CollectionEntry<"blog">[];
+}
+
+const { tag, posts } = Astro.props;
+const [profileEntry] = await getCollection("profile");
+const profile = profileEntry.data;
+const homeHref = import.meta.env.BASE_URL;
+const blogHref = `${homeHref}blog/`;
+const resumeHref = `${homeHref}resume/amogh-jayasimha-resume.pdf`;
+---
+
+<BaseLayout
+  title={`${tag.label} Writeups | Amogh Jayasimha`}
+  description={`Project writeups tagged ${tag.label} by Amogh Jayasimha.`}
+>
+  <main class="shell blog-shell">
+    <header class="topbar blog-topbar">
+      <a class="brand" href={homeHref}>
+        <span class="brand__mark">AJ</span>
+        <span class="brand__name">{profile.name}</span>
+      </a>
+      <nav aria-label="Blog navigation">
+        <a href={homeHref}>Portfolio</a>
+        <a href={`${homeHref}#work`}>Work</a>
+        <a href={blogHref} data-active="true">Blog</a>
+        <a href={`${homeHref}#contact`}>Contact</a>
+      </nav>
+      <div class="topbar__actions">
+        <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark mode" aria-pressed="false">
+          <span class="theme-toggle__icon theme-toggle__icon--moon" aria-hidden="true">
+            <img src="https://cdn.jsdelivr.net/npm/lucide-static@0.542.0/icons/moon.svg" alt="" />
+          </span>
+          <span class="theme-toggle__icon theme-toggle__icon--sun" aria-hidden="true">
+            <img src="https://cdn.jsdelivr.net/npm/lucide-static@0.542.0/icons/sun.svg" alt="" />
+          </span>
+        </button>
+        <a class="topbar__resume" href={resumeHref} target="_blank" rel="noreferrer">Resume</a>
+      </div>
+    </header>
+
+    <section class="blog-hero blog-hero--compact">
+      <a class="article__back" href={blogHref}>All writeups</a>
+      <p class="eyebrow">Tagged {tag.label}</p>
+      <h1>{posts.length} {posts.length === 1 ? "writeup" : "writeups"}</h1>
+      <p>Projects and field notes connected to {tag.label}.</p>
+    </section>
+
+    <section class="blog-index blog-index--tag" aria-label={`${tag.label} writeups`}>
+      <div class="blog-index__list">
+        {posts.map((post) => (
+          <article class="blog-index__item">
+            <div class="blog-index__meta">
+              <span>{formatPostDate(post.data.pubDate)}</span>
+              <span>{estimateReadingTime(post.body)}</span>
+            </div>
+            <h2 class="blog-index__title">
+              <a href={`${blogHref}${getPostSlug(post)}/`}>{post.data.title}</a>
+            </h2>
+            <p>{post.data.description}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+  </main>
+</BaseLayout>

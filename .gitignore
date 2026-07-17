@@ -7,3 +7,6 @@ node_modules/
 .env.*
 coverage/
 amogh_master_reference_v2.md
+.playwright-cli/
+output/playwright/
+tmp/

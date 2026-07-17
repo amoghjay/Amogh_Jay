@@ -6,9 +6,11 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro build",
+    "build": "npm run validate:blog && astro build",
     "preview": "astro preview",
-    "check": "astro check"
+    "check": "npm run validate:blog && astro check",
+    "validate:blog": "node scripts/validate-blog.mjs",
+    "new-post": "node scripts/new-post.mjs"
   },
   "keywords": [
     "astro",
@@ -22,6 +24,8 @@
   "type": "module",
   "dependencies": {
     "@astrojs/check": "^0.9.9",
+    "@astrojs/rss": "^4.0.19",
+    "@astrojs/sitemap": "^3.7.3",
     "astro": "^6.4.4",
     "typescript": "^6.0.3"
   },

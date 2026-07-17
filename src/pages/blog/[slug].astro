@@ -1,0 +1,256 @@
+---
+import { getCollection, render, type CollectionEntry } from "astro:content";
+import BaseLayout from "../../components/BaseLayout.astro";
+import {
+  estimateReadingTime,
+  formatPostDate,
+  getPostSlug,
+  getPublishedBlogPosts,
+  getRelatedBlogPosts,
+  slugifyTag
+} from "../../lib/blog";
+import "../../styles/global.css";
+
+export async function getStaticPaths() {
+  const entries = await getCollection("blog");
+  const posts = import.meta.env.DEV ? entries : getPublishedBlogPosts(entries);
+
+  return posts.map((post) => ({
+    params: { slug: getPostSlug(post) },
+    props: { post }
+  }));
+}
+
+interface Props {
+  post: CollectionEntry<"blog">;
+}
+
+const { post } = Astro.props;
+const isDraft = post.data.draft === true;
+const { Content, headings } = await render(post);
+
+const [profileEntry] = await getCollection("profile");
+const profile = profileEntry.data;
+
+const homeHref = import.meta.env.BASE_URL;
+const blogHref = `${import.meta.env.BASE_URL}blog/`;
+const resumeHref = `${import.meta.env.BASE_URL}resume/amogh-jayasimha-resume.pdf`;
+const tableOfContents = headings.filter((heading) => heading.depth === 2 || heading.depth === 3);
+const allPosts = getPublishedBlogPosts(await getCollection("blog"));
+const currentIndex = allPosts.findIndex((candidate) => candidate.id === post.id);
+const newerPost = currentIndex > 0 ? allPosts[currentIndex - 1] : null;
+const olderPost = currentIndex >= 0 && currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1] : null;
+const relatedPosts = getRelatedBlogPosts(post, allPosts);
+const postPath = `${blogHref}${getPostSlug(post)}/`;
+const siteOrigin = Astro.site ?? Astro.url;
+const canonicalUrl = post.data.canonicalUrl ?? new URL(postPath, siteOrigin).href;
+const socialImage = post.data.cover ? new URL(post.data.cover.src, siteOrigin).href : undefined;
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: post.data.title,
+  description: post.data.description,
+  datePublished: post.data.pubDate.toISOString(),
+  dateModified: (post.data.updatedDate ?? post.data.pubDate).toISOString(),
+  mainEntityOfPage: canonicalUrl,
+  author: {
+    "@type": "Person",
+    name: profile.name,
+    url: new URL(homeHref, siteOrigin).href
+  },
+  keywords: post.data.tags.join(", "),
+  ...(socialImage ? { image: socialImage } : {})
+};
+const projectLinks: Record<string, { href: string; label: string }> = {
+  "k8s-supply-chain-security": {
+    href: "https://github.com/amoghjay/k8s-supply-chain-security",
+    label: "Open project repo"
+  },
+  "k8s-chaos-promotion": {
+    href: "https://github.com/amoghjay/k8s-chaos-promotion",
+    label: "Open project repo"
+  }
+};
+const projectLink = post.data.projectId ? projectLinks[post.data.projectId] ?? null : null;
+---
+
+<BaseLayout
+  title={`${post.data.title} | Amogh Jayasimha`}
+  description={post.data.description}
+  type="article"
+  canonical={canonicalUrl}
+  image={socialImage}
+  publishedTime={post.data.pubDate}
+  modifiedTime={post.data.updatedDate ?? post.data.pubDate}
+  tags={post.data.tags}
+  structuredData={structuredData}
+  noindex={isDraft}
+>
+  <main class="shell article-shell">
+    <header class="topbar blog-topbar">
+      <a class="brand" href={homeHref}>
+        <span class="brand__mark">AJ</span>
+        <span class="brand__name">{profile.name}</span>
+      </a>
+      <nav aria-label="Article navigation">
+        <a href={homeHref}>Portfolio</a>
+        <a href={`${homeHref}#work`}>Work</a>
+        <a href={blogHref} data-active="true">Blog</a>
+        <a href={`${homeHref}#contact`}>Contact</a>
+      </nav>
+      <div class="topbar__actions">
+        <a class="topbar__icon" href={profile.links.github} target="_blank" rel="noreferrer" aria-label="GitHub">
+          <img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/github.svg" alt="" loading="lazy" />
+        </a>
+        <a class="topbar__icon" href={profile.links.linkedin} target="_blank" rel="noreferrer" aria-label="LinkedIn">
+          <img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/linkedin.svg" alt="" loading="lazy" />
+        </a>
+        <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark mode" aria-pressed="false">
+          <span class="theme-toggle__icon theme-toggle__icon--moon" aria-hidden="true">
+            <img src="https://cdn.jsdelivr.net/npm/lucide-static@0.542.0/icons/moon.svg" alt="" loading="lazy" />
+          </span>
+          <span class="theme-toggle__icon theme-toggle__icon--sun" aria-hidden="true">
+            <img src="https://cdn.jsdelivr.net/npm/lucide-static@0.542.0/icons/sun.svg" alt="" loading="lazy" />
+          </span>
+        </button>
+        <a class="topbar__resume" href={resumeHref} target="_blank" rel="noreferrer">
+          Resume
+        </a>
+      </div>
+    </header>
+
+    <article class="article" id="article-top">
+      <a class="article__back" href={blogHref}>Back to blog</a>
+      {isDraft && (
+        <aside class="draft-banner" role="status">
+          <strong>Local draft preview</strong>
+          <span>This route is generated during development only and is excluded from production builds, RSS, tags, and the sitemap.</span>
+        </aside>
+      )}
+
+      <header class="article__header">
+        <div class="article__meta">
+          <span>{formatPostDate(post.data.pubDate)}</span>
+          {post.data.updatedDate && <span>Updated {formatPostDate(post.data.updatedDate)}</span>}
+          <span>{estimateReadingTime(post.body)}</span>
+        </div>
+        <h1>{post.data.title}</h1>
+        <p>{post.data.description}</p>
+        <div class="blog-tags article__tags" aria-label="Post tags">
+          {post.data.tags.map((tag) => (
+            isDraft
+              ? <span>{tag}</span>
+              : <a href={`${blogHref}tags/${slugifyTag(tag)}/`}>{tag}</a>
+          ))}
+        </div>
+        {projectLink && (
+          <a class="article__repo-link" href={projectLink.href} target="_blank" rel="noreferrer">
+            {projectLink.label}
+          </a>
+        )}
+      </header>
+
+      {tableOfContents.length > 0 && (
+        <details class="article-toc article-toc--mobile">
+          <summary>On this page</summary>
+            <nav aria-label="Table of contents" data-article-toc>
+            {tableOfContents.map((heading) => (
+              <a class:list={{ "article-toc__nested": heading.depth === 3 }} href={`#${heading.slug}`}>
+                {heading.text}
+              </a>
+            ))}
+          </nav>
+        </details>
+      )}
+
+      <div class="article__body-grid">
+        <div class="article-prose">
+          <Content />
+        </div>
+
+        <aside class="article-sidebar" aria-label="Article overview">
+          {tableOfContents.length > 0 && (
+            <nav class="article-toc" aria-label="Table of contents" data-article-toc>
+              <p class="project-label">On this page</p>
+              {tableOfContents.map((heading) => (
+                <a class:list={{ "article-toc__nested": heading.depth === 3 }} href={`#${heading.slug}`}>
+                  {heading.text}
+                </a>
+              ))}
+            </nav>
+          )}
+        </aside>
+      </div>
+
+      <footer class="article-footer">
+        {(newerPost || olderPost) && (
+          <nav class="article-pagination" aria-label="More writeups">
+            {newerPost ? (
+              <a href={`${blogHref}${getPostSlug(newerPost)}/`}>
+                <span>Newer writeup</span>
+                <strong>{newerPost.data.title}</strong>
+              </a>
+            ) : <span></span>}
+            {olderPost && (
+              <a href={`${blogHref}${getPostSlug(olderPost)}/`}>
+                <span>Older writeup</span>
+                <strong>{olderPost.data.title}</strong>
+              </a>
+            )}
+          </nav>
+        )}
+
+        {relatedPosts.length > 0 && (
+          <section class="article-related" aria-labelledby="related-posts-title">
+            <p class="project-label" id="related-posts-title">Related writeups</p>
+            <div>
+              {relatedPosts.map((relatedPost) => (
+                <a href={`${blogHref}${getPostSlug(relatedPost)}/`}>
+                  <strong>{relatedPost.data.title}</strong>
+                  <span>{estimateReadingTime(relatedPost.body)}</span>
+                </a>
+              ))}
+            </div>
+          </section>
+        )}
+
+        <section class="article-author" aria-label="About the author">
+          <span class="brand__mark" aria-hidden="true">AJ</span>
+          <div>
+            <p class="project-label">Written by {profile.name}</p>
+            <p>Platform engineering field notes about safer delivery, Kubernetes reliability, and production guardrails.</p>
+            <div class="article-author__links">
+              <a class="text-link" href={blogHref}>All writeups</a>
+              {projectLink && <a class="text-link" href={projectLink.href} target="_blank" rel="noreferrer">Project repository</a>}
+              <a class="text-link" href={`${homeHref}rss.xml`}>RSS feed</a>
+              <a class="text-link" href="#article-top">Back to top</a>
+            </div>
+          </div>
+        </section>
+      </footer>
+
+      {post.data.externalUrl && (
+        <aside class="article-cta surface">
+          <p class="project-label">Full version</p>
+          <h2>Want the complete original writeup?</h2>
+          <p>
+            This local post keeps the portfolio version focused. The longer article has the extended
+            walkthrough and context.
+          </p>
+          <a class="button button--primary" href={post.data.externalUrl} target="_blank" rel="noreferrer">
+            {post.data.externalLabel ?? "Read the full writeup"}
+          </a>
+        </aside>
+      )}
+    </article>
+
+    <dialog class="image-lightbox" data-image-lightbox aria-label="Expanded article image">
+      <div class="image-lightbox__panel">
+        <button type="button" data-image-lightbox-close aria-label="Close expanded image">Close</button>
+        <img data-image-lightbox-image src="" alt="" />
+        <p data-image-lightbox-caption></p>
+        <a data-image-lightbox-original href="" target="_blank" rel="noreferrer">Open original image</a>
+      </div>
+    </dialog>
+  </main>
+</BaseLayout>
