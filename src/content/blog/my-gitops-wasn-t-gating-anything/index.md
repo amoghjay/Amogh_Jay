@@ -4,7 +4,11 @@ description: "I spent weeks building a promotion pipeline, then watched a config
 pubDate: 2026-07-17
 tags: ["Platform Engineering", "Kubernetes", "GitOps"]
 projectId: k8s-chaos-promotion
-featured: false
+series:
+  name: "Building a Chaos-Gated Promotion Pipeline"
+  part: 1
+  total: 3
+featured: true
 draft: false
 ---
 
@@ -23,7 +27,7 @@ reach a pod without living in git, how promotion between environments is gated, 
 pod does when its database disappears. And then I wanted to push it one step past what most
 pipelines do: **make it prove the app survives failure before it's allowed to ship.**
 
-*This is Part 1 of 3. Part 1 is the platform — GitOps, Helm, secrets, and the promotion
+*Part 1 is the platform — GitOps, Helm, secrets, and the promotion
 pipeline. Part 2 is how the load tests spend real on-chain money. Part 3 is the payoff:
 a chaos gate that blocks a regression a normal health check waves straight through.*
 

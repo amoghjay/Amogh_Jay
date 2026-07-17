@@ -99,6 +99,16 @@ Optional frontmatter:
 - `updatedDate` adds modified-date metadata.
 - `canonicalUrl` points search engines to an original publication.
 - `cover` and required `coverAlt` add article and social imagery.
+- `series` groups related posts into an ordered roadmap with automatic links:
+
+```yaml
+series:
+  name: "Building a Chaos-Gated Promotion Pipeline"
+  part: 2
+  total: 3
+```
+
+Use the exact same series name and total for every part. Each part number must be unique.
 
 Screenshots use standard Markdown image syntax:
 

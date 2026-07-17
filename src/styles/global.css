@@ -2285,6 +2285,87 @@ button:focus-visible {
   text-transform: uppercase;
 }
 
+.article-series {
+  max-width: 46rem;
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-soft);
+}
+
+.article-series__heading {
+  display: flex;
+  gap: 1rem;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.article-series__heading .project-label {
+  flex: 0 0 auto;
+  margin: 0;
+}
+
+.article-series__heading h2 {
+  margin: 0;
+  font-family: "Newsreader", serif;
+  font-size: 1.25rem;
+  line-height: 1.15;
+  text-align: right;
+}
+
+.article-series__parts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin: 0.85rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.article-series__part {
+  display: grid;
+  gap: 0.25rem;
+  height: 100%;
+  min-height: 4.5rem;
+  padding: 0.65rem;
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  background: var(--panel);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+a.article-series__part:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.article-series__part[data-current="true"] {
+  border-color: rgba(47, 157, 146, 0.38);
+  background: var(--accent-soft);
+}
+
+.article-series__part[data-pending="true"] {
+  color: var(--ink-muted);
+  background: transparent;
+}
+
+.article-series__part small {
+  color: var(--accent-strong);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.article-series__part strong {
+  align-self: end;
+  font-size: 0.78rem;
+  line-height: 1.25;
+}
+
 .article__body-grid {
   display: grid;
   grid-template-columns: minmax(0, 44rem) minmax(12rem, 14rem);
@@ -3315,6 +3396,23 @@ button.contact-link {
 
   .article-pagination {
     grid-template-columns: 1fr;
+  }
+
+  .article-series__heading {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .article-series__heading h2 {
+    text-align: left;
+  }
+
+  .article-series__parts {
+    grid-template-columns: 1fr;
+  }
+
+  .article-series__part {
+    min-height: auto;
   }
 
   .article-pagination > span:empty {

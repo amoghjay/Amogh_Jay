@@ -7,7 +7,7 @@ projectId: "k8s-supply-chain-security"
 cover: "./policy-reporter-dashboard.png"
 coverAlt: "Policy Reporter dashboard showing Kyverno policy results for the supply chain security demo"
 draft: false
-featured: true
+featured: false
 ---
 
 I was recently catching up on some of the tooling I worked with during my Co-op at Radius as a DevOps engineer, and I came across an article about securing Kubernetes deployments with Kyverno and Cosign. It clicked immediately. I’d used Kyverno for policy enforcement at work, but I’d never used it for container image signing and verification.
