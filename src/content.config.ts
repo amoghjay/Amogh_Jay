@@ -85,6 +85,11 @@ const blog = defineCollection({
       updatedDate: z.coerce.date().optional(),
       tags: z.array(z.string()).default([]),
       projectId: z.string().optional(),
+      series: z.object({
+        name: z.string().min(1),
+        part: z.number().int().positive(),
+        total: z.number().int().positive()
+      }).optional(),
       cover: image().optional(),
       coverAlt: z.string().optional(),
       canonicalUrl: z.url().optional(),
@@ -95,6 +100,9 @@ const blog = defineCollection({
     }).refine((post) => !post.cover || Boolean(post.coverAlt?.trim()), {
       message: "coverAlt is required when a cover image is provided",
       path: ["coverAlt"]
+    }).refine((post) => !post.series || post.series.part <= post.series.total, {
+      message: "series.part cannot be greater than series.total",
+      path: ["series", "part"]
     })
 });
 

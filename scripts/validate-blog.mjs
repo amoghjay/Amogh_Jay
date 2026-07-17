@@ -5,6 +5,8 @@ import process from "node:process";
 const root = join(process.cwd(), "src", "content", "blog");
 const errors = [];
 const warnings = [];
+const seriesParts = new Map();
+const seriesTotals = new Map();
 
 function collectMarkdownFiles(directory) {
   return readdirSync(directory).flatMap((entry) => {
@@ -16,6 +18,20 @@ function collectMarkdownFiles(directory) {
 function value(frontmatter, key) {
   const match = frontmatter.match(new RegExp(`^${key}:\\s*(.+)$`, "m"));
   return match?.[1]?.trim().replace(/^['"]|['"]$/g, "") ?? "";
+}
+
+function nestedValue(frontmatter, parent, key) {
+  const lines = frontmatter.split("\n");
+  const parentIndex = lines.findIndex((line) => new RegExp(`^${parent}:\\s*$`).test(line));
+  if (parentIndex < 0) return "";
+
+  for (const line of lines.slice(parentIndex + 1)) {
+    if (line.trim() && !/^\s/.test(line)) break;
+    const match = line.match(new RegExp(`^\\s+${key}:\\s*(.+)$`));
+    if (match) return match[1].trim().replace(/^['"]|['"]$/g, "");
+  }
+
+  return "";
 }
 
 const files = collectMarkdownFiles(root);
@@ -39,6 +55,9 @@ files.forEach((file) => {
   const tags = value(frontmatter, "tags");
   const draft = value(frontmatter, "draft") === "true";
   const isFeatured = value(frontmatter, "featured") === "true";
+  const seriesName = nestedValue(frontmatter, "series", "name");
+  const seriesPart = Number(nestedValue(frontmatter, "series", "part"));
+  const seriesTotal = Number(nestedValue(frontmatter, "series", "total"));
   const slug = relative(root, dirname(file)).replaceAll("\\", "/").replace(/\/$/, "");
 
   if (slugs.has(slug)) errors.push(`${label}: duplicate slug "${slug}" also used by ${slugs.get(slug)}`);
@@ -51,6 +70,28 @@ files.forEach((file) => {
   if (title.length > 90) warnings.push(`${label}: title is ${title.length} characters; consider keeping it under 90`);
   if (description && description.length < 40) warnings.push(`${label}: description is short (${description.length} characters)`);
   if (isFeatured && !draft) featured.push(label);
+
+  if (seriesName || seriesPart || seriesTotal) {
+    if (!seriesName || !Number.isInteger(seriesPart) || seriesPart < 1 || !Number.isInteger(seriesTotal) || seriesTotal < 1) {
+      errors.push(`${label}: series requires a name plus positive integer part and total values`);
+    } else if (seriesPart > seriesTotal) {
+      errors.push(`${label}: series part ${seriesPart} cannot exceed total ${seriesTotal}`);
+    } else {
+      const seriesKey = `${seriesName.toLowerCase()}:${seriesPart}`;
+      if (seriesParts.has(seriesKey)) {
+        errors.push(`${label}: series part ${seriesPart} is also used by ${seriesParts.get(seriesKey)}`);
+      } else {
+        seriesParts.set(seriesKey, label);
+      }
+
+      const knownTotal = seriesTotals.get(seriesName.toLowerCase());
+      if (knownTotal && knownTotal !== seriesTotal) {
+        errors.push(`${label}: series total ${seriesTotal} does not match the existing total ${knownTotal}`);
+      } else {
+        seriesTotals.set(seriesName.toLowerCase(), seriesTotal);
+      }
+    }
+  }
 
   for (const match of source.matchAll(/!\[([^\]]*)\]\(([^)]+)\)/g)) {
     const [, alt, target] = match;

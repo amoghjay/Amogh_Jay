@@ -36,11 +36,24 @@ const homeHref = import.meta.env.BASE_URL;
 const blogHref = `${import.meta.env.BASE_URL}blog/`;
 const resumeHref = `${import.meta.env.BASE_URL}resume/amogh-jayasimha-resume.pdf`;
 const tableOfContents = headings.filter((heading) => heading.depth === 2 || heading.depth === 3);
-const allPosts = getPublishedBlogPosts(await getCollection("blog"));
+const blogEntries = await getCollection("blog");
+const allPosts = getPublishedBlogPosts(blogEntries);
 const currentIndex = allPosts.findIndex((candidate) => candidate.id === post.id);
 const newerPost = currentIndex > 0 ? allPosts[currentIndex - 1] : null;
 const olderPost = currentIndex >= 0 && currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1] : null;
 const relatedPosts = getRelatedBlogPosts(post, allPosts);
+const visibleSeriesPosts = import.meta.env.DEV ? blogEntries : allPosts;
+const seriesParts = post.data.series
+  ? Array.from({ length: post.data.series.total }, (_, index) => {
+      const part = index + 1;
+      return {
+        part,
+        post: visibleSeriesPosts.find(
+          (candidate) => candidate.data.series?.name === post.data.series?.name && candidate.data.series?.part === part
+        ) ?? null
+      };
+    })
+  : [];
 const postPath = `${blogHref}${getPostSlug(post)}/`;
 const siteOrigin = Astro.site ?? Astro.url;
 const canonicalUrl = post.data.canonicalUrl ?? new URL(postPath, siteOrigin).href;
@@ -149,6 +162,39 @@ const projectLink = post.data.projectId ? projectLinks[post.data.projectId] ?? n
           </a>
         )}
       </header>
+
+      {post.data.series && (
+        <aside class="article-series" aria-labelledby="article-series-title">
+          <div class="article-series__heading">
+            <p class="project-label">Series · Part {post.data.series.part} of {post.data.series.total}</p>
+            <h2 id="article-series-title">{post.data.series.name}</h2>
+          </div>
+          <ol class="article-series__parts">
+            {seriesParts.map(({ part, post: seriesPost }) => (
+              <li>
+                {seriesPost ? (
+                  seriesPost.id === post.id ? (
+                    <span class="article-series__part" data-current="true" aria-current="page">
+                      <small>Part {part}</small>
+                      <strong>{seriesPost.data.title}</strong>
+                    </span>
+                  ) : (
+                    <a class="article-series__part" href={`${blogHref}${getPostSlug(seriesPost)}/`}>
+                      <small>Part {part}</small>
+                      <strong>{seriesPost.data.title}</strong>
+                    </a>
+                  )
+                ) : (
+                  <span class="article-series__part" data-pending="true">
+                    <small>Part {part}</small>
+                    <strong>Coming soon</strong>
+                  </span>
+                )}
+              </li>
+            ))}
+          </ol>
+        </aside>
+      )}
 
       {tableOfContents.length > 0 && (
         <details class="article-toc article-toc--mobile">
