@@ -1,6 +1,6 @@
 ---
 title: "My GitOps Wasn't Gating Anything"
-description: "I spent weeks building a promotion pipeline, then watched a config change sail straight to prod — here's the platform work that actually made GitOps gate."
+description: "I spent weeks building a promotion pipeline, then watched a config change sail straight to prod. Here's the platform work that actually made GitOps gate."
 pubDate: 2026-07-17
 tags: ["Platform Engineering", "Kubernetes", "GitOps"]
 projectId: k8s-chaos-promotion
@@ -13,13 +13,13 @@ draft: false
 ---
 
 At work, I spent a lot of time inside GitOps pipelines, ArgoCD, Kargo, and policy
-enforcement — the machinery that moves code from a git push to a running cluster. But I
+enforcement. Basically, the machinery that moves code from a git push to a running cluster. But I
 always worked on *pieces* of it. A policy here, a NetworkPolicy there, a promotion step
 someone else had already wired up. I never got to stand the whole thing up myself and own
 every layer.
 
-So I decided to build one from an empty GCP project. It took a few months — internal
-migrations, plenty of things I broke and had to fix, and a fair amount I only understood
+So I decided to build one from an empty GCP project. It took a few months. Along the way there were
+internal migrations, plenty of things I broke and had to fix, and a fair amount I only understood
 after it went wrong (with AI assistance along the way :) ). I wanted it to actually run the
 patterns I'd read about and worked next to. Anyone can `kubectl apply` a Deployment; the
 part I wanted to get right is everything around it: how config gets versioned, how secrets
@@ -27,7 +27,7 @@ reach a pod without living in git, how promotion between environments is gated, 
 pod does when its database disappears. And then I wanted to push it one step past what most
 pipelines do: **make it prove the app survives failure before it's allowed to ship.**
 
-*Part 1 is the platform — GitOps, Helm, secrets, and the promotion
+*Part 1 is the platform: GitOps, Helm, secrets, and the promotion
 pipeline. Part 2 is how the load tests spend real on-chain money. Part 3 is the payoff:
 a chaos gate that blocks a regression a normal health check waves straight through.*
 
@@ -35,23 +35,23 @@ a chaos gate that blocks a regression a normal health check waves straight throu
 
 ## What I Set Out to Build
 
-The app on top is a FastAPI URL shortener — deliberately ordinary, except for two things.
+The app on top is a deliberately ordinary FastAPI URL shortener, except for two things.
 Shortening a URL costs a real on-chain payment (x402 on a testnet, which is Part 2), and
 when its database or cache goes down the app is built to degrade instead of fall over: a
-request that can't reach Postgres gets a `503 "temporarily unavailable — retry shortly"`,
+request that can't reach Postgres gets a `503` with a `temporarily unavailable, retry shortly` message,
 not a 500 and not a hang. I kept the app itself simple on purpose so the interesting
 decisions would all sit in the platform around it. As someone who wants to work on the
 infrastructure / platform / SRE side of things, that platform was the part I actually cared
 about getting right.
 
 So the question driving Part 1 is: **what does it actually take to build a GitOps
-pipeline you'd trust to promote to prod on its own — and can you make it gate on more
+pipeline you'd trust to promote to prod on its own? Can you make it gate on more
 than "the pod is running"?**
 
 That last part is the thread worth following. Everything in this post is a precondition for
 the resilience gate I build in Part 3, and nearly everything I got wrong turned out to be a
-way that gate could have quietly lied to me — passed a build it never really tested, or
-tested a version that wasn't the one running. I'd used all these tools at work, but only in
+way that gate could have quietly lied to me. It could pass a build it never really tested, or
+test a version that wasn't the one running. I'd used all these tools at work, but only in
 pieces; standing the whole thing up myself, the sharp edges were never where the tutorials
 said they'd be. Most of this post is those sharp edges.
 
@@ -60,10 +60,10 @@ said they'd be. Most of this post is those sharp edges.
 The whole thing runs on one GKE cluster and is described entirely in git. The pieces:
 
 - **GKE Standard**, 2× `e2-standard-2`, one node pool, provisioned with Terraform.
-  Standard and *not* Autopilot — I hit that wall on purpose in Part 3, but the short
+  I chose Standard instead of Autopilot. I hit that wall on purpose in Part 3, but the short
   version is Autopilot won't run the privileged DaemonSet the chaos tooling needs.
-- **ArgoCD** in an app-of-apps layout — one root Application installs everything else.
-- **Kargo** for promotion — dev → staging → prod, with real gates between them.
+- **ArgoCD** in an app-of-apps layout, where one root Application installs everything else.
+- **Kargo** for promotion: dev → staging → prod, with real gates between them.
 - **External Secrets Operator** pulling from GCP Secret Manager over Workload Identity.
 - **kube-prometheus-stack + Loki + Grafana** for metrics and logs.
 - A **Helm chart** for the app, with a values overlay per environment.
@@ -71,13 +71,13 @@ The whole thing runs on one GKE cluster and is described entirely in git. The pi
 ![Chaos-gated promotion flow from a developer push through GitHub Actions, image signing, Kargo stages, rendered environment branches, ArgoCD, and the GKE workloads](./02-promotion-flow.png)
 *Read it left to right: CI builds and signs the image, Kargo turns it into Freight, staging has to survive the chaos gate, and ArgoCD syncs each rendered environment branch into GKE.*
 
-Everything below is how those fit together — and the places where the obvious approach
-was quietly wrong.
+Here is how those pieces fit together, including the places where the obvious approach
+turned out to be quietly wrong.
 
 ## GitOps: One Root App, and a Boundary I Learned to Draw
 
 ArgoCD runs as an **app-of-apps**: a single root Application watches `kubernetes/bootstrap/`
-and installs the platform components in **sync-wave order** — External Secrets first
+and installs the platform components in **sync-wave order**. External Secrets goes first
 (wave 1), then the observability stack (wave 2), then the chaos tooling (wave 3). Ordering
 matters because later waves depend on earlier ones: an app that references a secret store
 that doesn't exist yet just fails. Rebuilding the entire cluster is one `kubectl apply` of
@@ -89,14 +89,14 @@ the root app plus loading secrets.
 There's one boundary here I got wrong first and want to call out. The three application
 environments (`dev`/`staging`/`prod`) are created by an **ApplicationSet**, but they are
 deliberately *not* managed under the root app-of-apps. Kargo updates those Applications
-during promotion — and if the root app also reconciled them, two controllers would fight
+during promotion. If the root app also reconciled them, two controllers would fight
 over the same object forever. The rule I settled on is that the root app owns the platform
 components and Kargo owns the app environments, and nothing is reconciled by both.
 
 ## The Promotion Pipeline, and Why "GitOps" Wasn't Actually Gating Anything
 
-Kargo models promotion as **freight** — an immutable set of artifacts, here a container
-image tag — moving through **stages**. A Warehouse polls the registry for new `sha-` tags,
+Kargo models promotion as **freight**, an immutable set of artifacts (here, a container
+image tag) moving through **stages**. A Warehouse polls the registry for new `sha-` tags,
 turns each into freight, and flows it dev → staging → prod. Dev auto-promotes; staging and
 prod are gated.
 
@@ -106,7 +106,7 @@ prod are gated.
 Here's the part I got wrong, and it's worth the detour because it's a mistake that looks
 fine right up until it bites.
 
-I pushed a small change to the Helm chart — a probe path tweak, nothing scary — and went to
+I pushed a small change to the Helm chart, just a probe path tweak, and went to
 watch it move through dev and into staging like everything else. Except it was already in
 prod. Within a minute. No promotion, no gate, nothing had stopped it. I sat there for a
 second genuinely confused, because I'd spent weeks building a promotion pipeline whose entire
@@ -117,14 +117,14 @@ size of "everything that isn't an image tag."
 
 The fix is a pattern that's worth knowing by name: **rendered branches**. Instead of each
 environment rendering the Helm chart itself from `main`, the *promotion step* runs
-`helm template` and commits the resulting plain YAML to a per-environment branch —
+`helm template` and commits the resulting plain YAML to a per-environment branch:
 `env/dev`, `env/staging`, `env/prod`. ArgoCD watches the rendered branch, not the chart:
 
 ```yaml
 # kubernetes/apps/applicationset.yaml
 source:
   repoURL: https://github.com/amoghjay/k8s-chaos-promotion.git
-  targetRevision: env/{{env}}   # the rendered branch — NOT main
+  targetRevision: env/{{env}}   # the rendered branch, NOT main
   path: .
   directory:
     recurse: true   # rendered output nests under templates/ + charts/;
@@ -133,13 +133,13 @@ source:
 
 That `recurse: true` line cost me a scare. The `helm template` output nests manifests under
 `url-shortener/templates/` and `charts/`, and ArgoCD doesn't recurse into subdirectories by
-default — so without it the app finds nothing at the root and prunes itself down to empty. I
+default. Without it, the app finds nothing at the root and prunes itself down to empty. I
 caught it by sanity-checking what had actually landed in `env/dev` before flipping staging and
 prod over, which I'd recommend to anyone standing this up: look at the rendered branch with
 your own eyes before you trust it.
 
-![The env/staging branch on GitHub: plain rendered Kubernetes manifests, with the commit authored by Kargo — "render staging @ sha-1f2e68e"](./env-staging-rendered-p1.png)
-*This is what ArgoCD actually watches — plain YAML on `env/staging`, committed by Kargo itself, no Helm in the loop. (That `checksum/config` annotation on line 31 is the next section's whole story.)*
+![The env/staging branch on GitHub: plain rendered Kubernetes manifests, with the commit authored by Kargo as "render staging @ sha-1f2e68e"](./env-staging-rendered-p1.png)
+*This is what ArgoCD actually watches: plain YAML on `env/staging`, committed by Kargo itself, with no Helm in the loop. (That `checksum/config` annotation on line 31 is the next section's whole story.)*
 
 Now a chart change is just another change that has to earn its way forward. It lands in
 `env/dev` only when dev promotes, reaches `env/staging` only through a promotion, and gets
@@ -149,14 +149,14 @@ ungated. That was the hole in mine, and it's the first way the resilience gate c
 lied to me: a gate can only test changes that actually pass through it, and my config changes
 weren't passing through it at all.
 
-> **The takeaway:** a GitOps gate only means something if every deployable change — image
-> and configuration — is forced through the same promotion path.
+> **The takeaway:** a GitOps gate only means something if every deployable change, including
+> images and configuration, is forced through the same promotion path.
 
 Prod keeps a manual gate on top of everything. If you try to promote freight that didn't
 pass verification upstream, Kargo makes you say so explicitly:
 
 ![Kargo manual approval dialog: warns the freight does not meet promotion criteria and asks for explicit approval](./kargo-manual-approval-modal-p1.png)
-*You can override the gate — but only on purpose, and it's recorded.*
+*You can override the gate, but only on purpose, and it's recorded.*
 
 ## The Helm Chart, Done Properly
 
@@ -174,9 +174,9 @@ I had a one-line config change to ship: set the app's worker count to 1. I commi
 watched it promote through the pipeline, and watched ArgoCD sync the new ConfigMap. Green
 across the board. Then I checked a running pod with `printenv` and it still had the old
 value. The pods had never restarted. It turns out a ConfigMap update on its own doesn't roll
-the Deployment — the pods keep reading the old values until something else happens to restart
-them, and nothing was going to. So the change "shipped" and did nothing at all — no error, no
-warning, just the old value quietly still in place.
+the Deployment. The pods keep reading the old values until something else happens to restart
+them, and nothing was going to. So the change "shipped" and did nothing at all. There was no
+error or warning, just the old value quietly still in place.
 
 
 The fix is five lines: put a checksum of the rendered ConfigMap into the pod template's
@@ -185,7 +185,7 @@ annotations.
 ```yaml
 # helm/url-shortener/templates/deployment.yaml
 annotations:
-  # Roll pods when the rendered ConfigMap changes — otherwise a config-only
+  # Roll pods when the rendered ConfigMap changes. Otherwise a config-only
   # promotion updates the ConfigMap without restarting anything.
   checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
 ```
@@ -209,7 +209,7 @@ I got it wrong myself (Part 3), and the chart comments say exactly why:
 ```yaml
 # helm/url-shortener/templates/deployment.yaml
 livenessProbe:
-  # /livez is process-only and never touches Postgres/Redis — a dependency
+  # /livez is process-only and never touches Postgres/Redis. A dependency
   # outage must fail readiness, not liveness (a restart can't fix a
   # downstream DB and cascades instead).
   httpGet: { path: /livez, port: http }
@@ -233,14 +233,14 @@ become an 85-second one as both pods dutifully restarted. More on that later.
 
 Nothing secret lives in the repo. The **External Secrets Operator** (ESO) pulls secrets from
 GCP Secret Manager at runtime, and the part I care about most is how it authenticates: it uses
-**Workload Identity**, so there's no downloaded key anywhere. No service-account JSON file
-mounted in a pod, none committed to git — the operator's Kubernetes service account *is* a GCP
-identity, and GKE hands it short-lived tokens automatically. Downloaded keys are a recurring
-cause of breaches — they leak into logs, get committed by accident, and outlive their rotation
+**Workload Identity**, so there's no downloaded key anywhere. No service-account JSON file is
+mounted in a pod or committed to git. Instead, the operator's Kubernetes service account *is* a
+GCP identity, and GKE hands it short-lived tokens automatically. Downloaded keys are a recurring
+source of breaches. They leak into logs, get committed by accident, and outlive their rotation
 windows. With Workload Identity there's no key to leak in the first place.
 
-In Secret Manager I store only the raw components — the database password, the service wallet
-address — and the app's `ExternalSecret` assembles the full `DATABASE_URL` from them with a
+In Secret Manager I store only the raw components, such as the database password and service
+wallet address. The app's `ExternalSecret` assembles the full `DATABASE_URL` from them with a
 template. So the connection string's shape lives in the chart and Secret Manager holds nothing
 but the actual secret values. Rotating a password is a one-line change there, and ESO updates
 the Kubernetes Secret within its refresh interval. That is not the same as the running app
@@ -262,8 +262,8 @@ about **$14–17/month**. The trick is scaling the node pool to zero between ses
 [GKE free tier](https://cloud.google.com/kubernetes-engine/pricing) provides a monthly credit
 that offsets the management fee for one zonal Standard or Autopilot cluster; it does *not*
 cover the nodes, networking, or storage. With the node pool at zero, the cluster state and
-PVCs remain, and the whole platform comes back in about two minutes. I never
-`terraform destroy` — I just turn the compute off.
+PVCs remain, and the whole platform comes back in about two minutes. I don't run
+`terraform destroy`; I just turn the compute off.
 
 ## What I Learned Along the Way
 
@@ -271,10 +271,10 @@ PVCs remain, and the whole platform comes back in about two minutes. I never
 
 This is the GitOps bootstrap chicken-and-egg.
 
-My plan was that every single thing on the cluster would come from git — one `kubectl apply`
-of the root app and walk away. That mostly held, but a few things can't work that way, and
+My plan was that every single thing on the cluster would come from git. Run one `kubectl apply`
+for the root app, then walk away. That mostly held, but a few things can't work that way, and
 the reason is circular. ArgoCD reads the repo that defines everything else, but to clone a
-private repo it needs a git credential — and that credential obviously can't live in the repo
+private repo it needs a git credential, and that credential obviously can't live in the repo
 it hasn't cloned yet. Same shape for the Grafana admin secret: it goes into the `monitoring`
 namespace, but that namespace doesn't exist until the root app has already synced. So a
 handful of secrets have to be applied out-of-band, once, right after bootstrap, before the
@@ -299,23 +299,23 @@ what makes it so easy to leave lurking in your Terraform.
 
 By the end I had a platform I trusted: config versioned through promotion, secrets that never
 touch git, a chart that rolls its pods on a config change, and probes that don't turn a
-dependency blip into a self-inflicted outage — those last two are exactly why I'll be able to
+dependency blip into a self-inflicted outage. Those last two are exactly why I'll be able to
 believe the gate later when it says a build survived a database outage. That's the real
 takeaway: "healthy" and "safe to ship" are different claims, and closing the gap starts here,
 with a platform disciplined enough that a gate built on it means something. Concretely, it's
-what lets the pipeline do this — block a build from prod that didn't survive a dependency
+what lets the pipeline do this: block a build from prod that didn't survive a dependency
 outage, even though every health check said it was fine:
 
 ![Kargo stages: dev Ready, staging FAILED (chaos gate rejected the freight), prod still on the last build that survived](./kargo-stages-staging-failed-p1.png)
-*staging is red because the freight failed the resilience gate — the health check passed fine. The broken build never reaches prod; how that gate works is Part 3.*
+*Staging is red because the freight failed the resilience gate, even though the health check passed. The broken build never reaches prod. How that gate works is Part 3.*
 
 Every gate so far still only answers one question: *is it up?* The gate I actually wanted
-answers *does it survive failure?* — and to answer that honestly, the load test driving it
+answers *does it survive failure?* To answer that honestly, the load test driving it
 can't send fake traffic. It has to exercise the app's real transaction, which here is an
 on-chain payment. Making that work is Part 2.
 
 The most reusable piece here, if you're already running ArgoCD and shipping Helm charts, is
-the rendered-branches pattern — it's the change that made my config changes actually stop at
+the rendered-branches pattern. It's the change that made my config changes actually stop at
 the gates instead of sailing straight to prod. The full setup is in the repo if you want to
 pull it apart.
 
